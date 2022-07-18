@@ -39,6 +39,8 @@ class Intro extends StatelessWidget {
                     fontSize: 30,
                   ),
                 ),
+                SizedBox(height: 10),
+                Text('©2022. WarmMinji. All rights reserved.'),
               ],
             ),
           ),

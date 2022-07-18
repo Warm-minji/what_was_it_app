@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:what_was_it_app/view/home/icon_card_widget.dart';
+import 'package:what_was_it_app/view/home/add_note_widget.dart';
+import 'package:what_was_it_app/view/component/icon_card_widget.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -38,7 +39,29 @@ class HomeScreen extends StatelessWidget {
       body: Column(
         children: [
           InkWell(
-            onTap: () {},
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
+                ),
+                builder: (context) {
+                  return DraggableScrollableSheet(
+                    initialChildSize: 0.7,
+                    minChildSize: 0.7,
+                    maxChildSize: 0.9,
+                    expand: false,
+                    builder: (context, scrollController) => SizedBox(
+                      child: SingleChildScrollView(
+                        controller: scrollController,
+                        child: AddNoteWidget(),
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
             child: IconCardWidget(icon: Icons.add_circle_outline, title: '기억 노트 추가하기'),
           ),
           InkWell(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:what_was_it_app/view/intro.dart';
 
 void main() {
@@ -10,15 +11,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        primaryColor: Colors.brown,
-        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.brown),
-        textTheme: const TextTheme(
-          bodyText2: TextStyle(fontFamily: 'GowunDodum'),
-        )
+    return ProviderScope(
+      child: MaterialApp(
+        theme: ThemeData(
+          primaryColor: Colors.brown,
+          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.brown),
+          textTheme: const TextTheme(
+            bodyText2: TextStyle(fontFamily: 'GowunDodum'),
+          )
+        ),
+        home: Intro(),
       ),
-      home: Intro(),
     );
   }
 }

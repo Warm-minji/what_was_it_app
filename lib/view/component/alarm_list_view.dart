@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:what_was_it_app/view/component/alarm_list_view_controller.dart';
 
 class AlarmListView extends StatefulWidget {
   const AlarmListView({Key? key, required this.controller}) : super(key: key);
@@ -30,8 +29,8 @@ class _AlarmListViewState extends State<AlarmListView> {
       child: Row(
         children: [
           ...widget.controller.getAlarmList().map((e) {
-            int month = e.inDays ~/ 30;
-            int day = e.inDays % 30;
+            int month = e ~/ 30;
+            int day = e % 30;
 
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -42,7 +41,10 @@ class _AlarmListViewState extends State<AlarmListView> {
                 ),
                 child: Row(
                   children: [
-                    Text('${(month != 0) ? '$month개월 ' : ''}$day일 후', style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor)),
+                    Text(
+                      '${(month != 0) ? '$month개월 ' : ''}${(day != 0) ? '$day일 ' : ''}후',
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
+                    ),
                     const SizedBox(width: 10),
                     InkWell(
                       onTap: () {
@@ -58,5 +60,32 @@ class _AlarmListViewState extends State<AlarmListView> {
         ],
       ),
     );
+  }
+}
+
+class AlarmListViewController extends ChangeNotifier {
+  final List<int> _alarmList = [];
+
+  AlarmListViewController();
+
+  List<int> getAlarmList() => _alarmList;
+
+  void addAlarm(int alarm) {
+    if (_alarmList.contains(alarm)) {
+      return;
+    }
+    _alarmList.add(alarm);
+    _alarmList.sort();
+    notifyListeners();
+  }
+
+  void removeAlarm(int alarm) {
+    _alarmList.remove(alarm);
+    notifyListeners();
+  }
+
+  void clear() {
+    _alarmList.clear();
+    notifyListeners();
   }
 }

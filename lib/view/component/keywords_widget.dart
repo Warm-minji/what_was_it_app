@@ -2,15 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:what_was_it_app/core/theme.dart';
-import 'package:what_was_it_app/view/home/add_note_screen.dart';
 
-class KeywordsWidget extends ConsumerWidget {
-  const KeywordsWidget({Key? key, required this.keywords}) : super(key: key);
+class KeywordsWidget extends StatefulWidget {
+  const KeywordsWidget({Key? key, required this.controller}) : super(key: key);
 
-  final List<String> keywords;
+  final KeywordWidgetController controller;
 
   @override
-  Widget build(BuildContext context, ref) {
+  State<KeywordsWidget> createState() => _KeywordsWidgetState();
+}
+
+class _KeywordsWidgetState extends State<KeywordsWidget> {
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(() {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    List<String> keywords = widget.controller.getKeywords();
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -24,8 +37,7 @@ class KeywordsWidget extends ConsumerWidget {
                   alignment: (idx % 2 == 0) ? AlignmentDirectional.centerStart : AlignmentDirectional.centerEnd,
                   child: GestureDetector(
                     onTap: () {
-                      keywords.remove(keywords[idx]);
-                      ref.read(keywordsProvider.state).state = [...keywords];
+                      widget.controller.removeKeyword(idx);
                     },
                     child: KeywordCard(keyword: keywords[idx]),
                   ),
@@ -56,5 +68,24 @@ class KeywordCard extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class KeywordWidgetController extends ChangeNotifier {
+  final List<String> _keywords = [];
+
+  List<String> getKeywords() => _keywords;
+
+  void addKeyword(String keyword) {
+    _keywords.add(keyword);
+    notifyListeners();
+  }
+
+  void removeKeyword(int index) {
+    if (index < 0 || index >= _keywords.length) {
+      return;
+    }
+    _keywords.removeAt(index);
+    notifyListeners();
   }
 }

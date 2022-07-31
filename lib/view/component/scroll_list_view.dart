@@ -1,6 +1,5 @@
 import 'package:clickable_list_wheel_view/clickable_list_wheel_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:what_was_it_app/view/component/scroll_list_view_controller.dart';
 
 class ScrollListView extends StatefulWidget {
   const ScrollListView({Key? key, required this.controller, required this.item}) : super(key: key);
@@ -67,4 +66,13 @@ class ScrollListItem extends StatelessWidget {
       ),
     );
   }
+}
+
+class ScrollListViewController {
+  int _currentIdx = 0;
+
+  ScrollListViewController();
+
+  int getCurrentIndex() => _currentIdx;
+  void setCurrentIndex(int idx) => _currentIdx = idx;
 }

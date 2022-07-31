@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:what_was_it_app/core/theme.dart';
 import 'package:what_was_it_app/view/component/alarm_list_view.dart';
-import 'package:what_was_it_app/view/component/alarm_list_view_controller.dart';
 import 'package:what_was_it_app/view/component/scroll_list_view.dart';
-import 'package:what_was_it_app/view/component/scroll_list_view_controller.dart';
 
 class AddNoteAlarmScreen extends ConsumerStatefulWidget {
   const AddNoteAlarmScreen({Key? key}) : super(key: key);
@@ -58,6 +56,7 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
                               setState(() {
                                 if (!isAlarmTypeRepeatable) {
                                   isAlarmTypeRepeatable = true;
+                                  _alarmController.clear();
                                 }
                               });
                             },
@@ -85,6 +84,7 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
                               setState(() {
                                 if (isAlarmTypeRepeatable) {
                                   isAlarmTypeRepeatable = false;
+                                  _alarmController.clear();
                                 }
                               });
                             },
@@ -143,8 +143,8 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
                       child: InkWell(
                         onTap: () {
                           // 30*개월 + 일
-                          Duration alarm = Duration(days: _monthController.getCurrentIndex() * 30 + _dayController.getCurrentIndex());
-                          if (alarm.inDays == 0) return;
+                          int alarm = _monthController.getCurrentIndex() * 30 + _dayController.getCurrentIndex();
+                          if (alarm == 0) return;
 
                           _alarmController.addAlarm(alarm);
                         },

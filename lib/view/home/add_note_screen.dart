@@ -2,10 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:what_was_it_app/model/note.dart';
 import 'package:what_was_it_app/view/component/keywords_widget.dart';
 import 'package:what_was_it_app/view/home/add_note_alarm_screen.dart';
 
-final keywordsProvider = StateProvider<List<String>>((ref) => []);
+final noteProvider = StateProvider(
+  (ref) => Note(
+    title: "",
+    category: "",
+    keywords: [],
+    alarmPeriods: [],
+    isRepeatable: false,
+    pubDate: DateTime.now(),
+  ),
+);
 
 class AddNoteScreen extends ConsumerStatefulWidget {
   const AddNoteScreen({Key? key}) : super(key: key);
@@ -22,7 +32,7 @@ class _AddNoteWidgetState extends ConsumerState<AddNoteScreen> with SingleTicker
 
   late AnimationController animationController;
 
-  final List<String> keywords = [];
+  late KeywordWidgetController keywordWidgetController;
 
   @override
   void initState() {
@@ -31,6 +41,8 @@ class _AddNoteWidgetState extends ConsumerState<AddNoteScreen> with SingleTicker
 
     titleController = TextEditingController();
     keywordController = TextEditingController();
+
+    keywordWidgetController = KeywordWidgetController();
 
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       Future.delayed(const Duration(milliseconds: 150), () => animationController.forward());
@@ -101,14 +113,12 @@ class _AddNoteWidgetState extends ConsumerState<AddNoteScreen> with SingleTicker
                         onSubmitted: (val) {
                           val = val.trim();
                           if (val.isEmpty) return;
-                          setState(() {
-                            keywords.add(val);
-                          });
+                          keywordWidgetController.addKeyword(val);
                           keywordController.clear();
                         },
                       ),
                       const SizedBox(height: 20),
-                      Expanded(child: KeywordsWidget(keywords: keywords)),
+                      Expanded(child: KeywordsWidget(controller: keywordWidgetController)),
                     ],
                   ),
                 ],
@@ -119,12 +129,12 @@ class _AddNoteWidgetState extends ConsumerState<AddNoteScreen> with SingleTicker
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          if (titleController.text.trim().isEmpty || keywords.isEmpty) {
+          if (titleController.text.trim().isEmpty || keywordWidgetController.getKeywords().isEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('주제와 키워드를 모두 입력해주세요')));
             return;
           }
           ref.read(AddNoteScreen.addNoteDataProvider)['title'] = titleController.text;
-          ref.read(AddNoteScreen.addNoteDataProvider)['keywords'] = keywords;
+          ref.read(AddNoteScreen.addNoteDataProvider)['keywords'] = keywordWidgetController.getKeywords();
           Navigator.push(context, MaterialPageRoute(builder: (context) => AddNoteAlarmScreen()));
         },
         child: const Icon(FontAwesomeIcons.angleRight),

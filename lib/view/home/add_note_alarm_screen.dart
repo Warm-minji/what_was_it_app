@@ -15,17 +15,9 @@ class AddNoteAlarmScreen extends ConsumerStatefulWidget {
 
 class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
   bool isAlarmTypeRepeatable = false;
-  final ScrollController _dayScrollController = ScrollController();
   final ScrollListViewController _monthController = ScrollListViewController();
   final ScrollListViewController _dayController = ScrollListViewController();
   final AlarmListViewController _alarmController = AlarmListViewController();
-
-  @override
-  void initState() {
-    _dayScrollController.addListener(() {
-      print(_dayScrollController.position);
-    });
-  }
 
   @override
   Widget build(BuildContext context) {

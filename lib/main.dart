@@ -9,18 +9,23 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
+  static const primaryColor = Colors.brown;
+
   @override
   Widget build(BuildContext context) {
     return ProviderScope(
       child: MaterialApp(
         theme: ThemeData(
-          primaryColor: Colors.brown,
-          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.brown),
+          primaryColor: primaryColor,
+          colorScheme: ColorScheme.fromSwatch(primarySwatch: primaryColor),
           textTheme: const TextTheme(
             bodyText2: TextStyle(fontFamily: 'GowunDodum'),
-          )
+          ),
+          snackBarTheme: const SnackBarThemeData(
+            backgroundColor: primaryColor,
+          ),
         ),
-        home: Intro(),
+        home: const Intro(),
       ),
     );
   }

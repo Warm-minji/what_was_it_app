@@ -10,29 +10,25 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Column(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                InkWell(
-                  onTap: () {
-                    // TODO
-                  },
-                  child: const Icon(FontAwesomeIcons.bars),
-                ),
-                InkWell(
-                  onTap: () {
-                    // TODO
-                  },
-                  child: const Icon(FontAwesomeIcons.bell),
-                ),
-              ],
+            InkWell(
+              onTap: () {
+                // TODO
+              },
+              child: const Icon(FontAwesomeIcons.bars),
+            ),
+            InkWell(
+              onTap: () {
+                // TODO
+              },
+              child: const Icon(FontAwesomeIcons.bell),
             ),
           ],
         ),
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(80),
+          preferredSize: const Size.fromHeight(110),
           child: IconCardWidget(icon: FontAwesomeIcons.handshake, title: '반갑습니다', subtitle: '잊으셔도 괜찮아요. 같이 기억해요.', textColor: Colors.white),
         ),
       ),

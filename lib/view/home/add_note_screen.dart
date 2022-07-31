@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:what_was_it_app/core/theme.dart';
 import 'package:what_was_it_app/model/note.dart';
 import 'package:what_was_it_app/view/component/keywords_widget.dart';
 import 'package:what_was_it_app/view/home/add_note_alarm_screen.dart';
@@ -67,47 +68,82 @@ class _AddNoteWidgetState extends ConsumerState<AddNoteScreen> with SingleTicker
               children: [
                 Column(
                   children: [
-                    Hero(
-                      tag: 'addNoteAlarm',
-                      child: Text(
-                        '기억 메모장',
-                        style: TextStyle(
-                          fontSize: 22,
-                          color: Theme.of(context).primaryColor,
-                          fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.none,
-                          fontFamily: 'GowunDodum',
+                    SizedBox(
+                      height: 50,
+                      child: Align(
+                        alignment: AlignmentDirectional.center,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Hero(
+                              tag: 'addNoteAlarm',
+                              child: Text(
+                                '기억 메모장',
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  color: Theme.of(context).primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.none,
+                                  fontFamily: 'GowunDodum',
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Icon(FontAwesomeIcons.pencil, color: Theme.of(context).primaryColor),
+                          ],
                         ),
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: titleController,
-                      style: const TextStyle(fontSize: 20),
-                      decoration: const InputDecoration(
-                        label: Align(
-                          alignment: AlignmentDirectional.centerStart,
-                          child: Text('기억할 주제를 입력해주세요', style: TextStyle(fontSize: 20)),
+                    const Divider(thickness: 3, height: 0),
+                    SizedBox(
+                      height: 50,
+                      child: TextField(
+                        controller: titleController,
+                        style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor),
+                        decoration: const InputDecoration(
+                          labelText: '',
+                          hintText: '기억할 주제 입력!',
+                          prefixIcon: Icon(Icons.arrow_forward),
                         ),
-                        border: UnderlineInputBorder(),
                       ),
                     ),
-                    const SizedBox(height: 30),
-                    TextField(
-                      controller: keywordController,
-                      decoration: const InputDecoration(
-                        label: Text('기억할 키워드를 입력해주세요', style: TextStyle(fontSize: 20)),
-                        hintText: '한 단어 입력 후 엔터!',
-                        hintStyle: TextStyle(fontSize: 13),
+                    const SizedBox(height: 50),
+                    const Divider(thickness: 3, height: 0),
+                    SizedBox(
+                      height: 50,
+                      child: Align(
+                        alignment: AlignmentDirectional.center,
+                        child: Text(
+                          '관련 키워드 목록',
+                          style: TextStyle(
+                            fontSize: 22,
+                            color: Theme.of(context).primaryColor,
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.none,
+                            fontFamily: 'GowunDodum',
+                          ),
+                        ),
                       ),
-                      onSubmitted: (val) {
-                        val = val.trim();
-                        if (val.isEmpty) return;
-                        keywordWidgetController.addKeyword(val);
-                        keywordController.clear();
-                      },
                     ),
-                    const SizedBox(height: 20),
+                    const Divider(thickness: 3, height: 0),
+                    SizedBox(
+                      height: 50,
+                      child: TextField(
+                        controller: keywordController,
+                        style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor),
+                        decoration: const InputDecoration(
+                          labelText: '',
+                          hintText: '키워드 입력 후 엔터!',
+                          prefixIcon: Icon(Icons.arrow_forward),
+                        ),
+                        onSubmitted: (val) {
+                          val = val.trim();
+                          if (val.isEmpty) return;
+                          keywordWidgetController.addKeyword(val);
+                          keywordController.clear();
+                        },
+                      ),
+                    ),
                     Expanded(child: KeywordsWidget(controller: keywordWidgetController)),
                   ],
                 ),
@@ -124,7 +160,7 @@ class _AddNoteWidgetState extends ConsumerState<AddNoteScreen> with SingleTicker
           }
           ref.read(AddNoteScreen.addNoteDataProvider)['title'] = titleController.text;
           ref.read(AddNoteScreen.addNoteDataProvider)['keywords'] = keywordWidgetController.getKeywords();
-          Navigator.push(context, MaterialPageRoute(builder: (context) => AddNoteAlarmScreen()));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const AddNoteAlarmScreen()));
         },
         child: const Icon(FontAwesomeIcons.angleRight),
       ),

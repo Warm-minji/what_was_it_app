@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -25,16 +27,16 @@ class _KeywordsWidgetState extends State<KeywordsWidget> {
   Widget build(BuildContext context) {
     List<String> keywords = widget.controller.getKeywords();
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: ListView.builder(
-          itemCount: keywords.length,
-          itemBuilder: (context, idx) {
-            return Column(
-              children: [
-                const Divider(height: 0, thickness: 2),
-                Align(
-                  alignment: (idx % 2 == 0) ? AlignmentDirectional.centerStart : AlignmentDirectional.centerEnd,
+    return ListView.builder(
+        itemCount: max(5, keywords.length),
+        itemBuilder: (context, idx) {
+          return Column(
+            children: [
+              (idx < keywords.length) ?
+              SizedBox(
+                height: 50,
+                child: Align(
+                  alignment: AlignmentDirectional.centerStart,
                   child: GestureDetector(
                     onTap: () {
                       widget.controller.removeKeyword(idx);
@@ -42,11 +44,11 @@ class _KeywordsWidgetState extends State<KeywordsWidget> {
                     child: KeywordCard(keyword: keywords[idx]),
                   ),
                 ),
-                if (idx == keywords.length - 1) const Divider(height: 0, thickness: 2),
-              ],
-            );
-          }),
-    );
+              ) : const SizedBox(height: 50),
+              const Divider(height: 0, thickness: 3),
+            ],
+          );
+        });
   }
 }
 
@@ -60,11 +62,10 @@ class KeywordCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
         children: [
-          Flexible(child: Text(keyword, style: kLargeTextStyle)),
+          Flexible(child: Text(keyword, style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor))),
           const SizedBox(width: 10),
-          const Icon(FontAwesomeIcons.xmark),
+          Icon(FontAwesomeIcons.eraser, color: Theme.of(context).primaryColor),
         ],
       ),
     );

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:what_was_it_app/model/note.dart';
@@ -30,30 +29,23 @@ class _AddNoteWidgetState extends ConsumerState<AddNoteScreen> with SingleTicker
   late TextEditingController titleController;
   late TextEditingController keywordController;
 
-  late AnimationController animationController;
-
   late KeywordWidgetController keywordWidgetController;
 
   @override
   void initState() {
     super.initState();
-    animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300))..addListener(() => setState(() {}));
 
     titleController = TextEditingController();
     keywordController = TextEditingController();
 
     keywordWidgetController = KeywordWidgetController();
-
-    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-      Future.delayed(const Duration(milliseconds: 150), () => animationController.forward());
-    });
   }
 
   @override
   void dispose() {
     titleController.dispose();
     keywordController.dispose();
-    animationController.dispose();
+    keywordWidgetController.dispose();
     super.dispose();
   }
 
@@ -71,58 +63,55 @@ class _AddNoteWidgetState extends ConsumerState<AddNoteScreen> with SingleTicker
           child: SizedBox(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
-            child: Opacity(
-              opacity: animationController.value,
-              child: Stack(
-                children: [
-                  Column(
-                    children: [
-                      Hero(
-                        tag: 'addNoteAlarm',
-                        child: Text(
-                          '기억 메모장',
-                          style: TextStyle(
-                            fontSize: 22,
-                            color: Theme.of(context).primaryColor,
-                            fontWeight: FontWeight.bold,
-                            decoration: TextDecoration.none,
-                            fontFamily: 'GowunDodum',
-                          ),
+            child: Stack(
+              children: [
+                Column(
+                  children: [
+                    Hero(
+                      tag: 'addNoteAlarm',
+                      child: Text(
+                        '기억 메모장',
+                        style: TextStyle(
+                          fontSize: 22,
+                          color: Theme.of(context).primaryColor,
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.none,
+                          fontFamily: 'GowunDodum',
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      TextField(
-                        controller: titleController,
-                        style: const TextStyle(fontSize: 20),
-                        decoration: const InputDecoration(
-                          label: Align(
-                            alignment: AlignmentDirectional.centerStart,
-                            child: Text('기억할 주제를 입력해주세요', style: TextStyle(fontSize: 20)),
-                          ),
-                          border: UnderlineInputBorder(),
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: titleController,
+                      style: const TextStyle(fontSize: 20),
+                      decoration: const InputDecoration(
+                        label: Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          child: Text('기억할 주제를 입력해주세요', style: TextStyle(fontSize: 20)),
                         ),
+                        border: UnderlineInputBorder(),
                       ),
-                      const SizedBox(height: 30),
-                      TextField(
-                        controller: keywordController,
-                        decoration: const InputDecoration(
-                          label: Text('기억할 키워드를 입력해주세요', style: TextStyle(fontSize: 20)),
-                          hintText: '한 단어 입력 후 엔터!',
-                          hintStyle: TextStyle(fontSize: 13),
-                        ),
-                        onSubmitted: (val) {
-                          val = val.trim();
-                          if (val.isEmpty) return;
-                          keywordWidgetController.addKeyword(val);
-                          keywordController.clear();
-                        },
+                    ),
+                    const SizedBox(height: 30),
+                    TextField(
+                      controller: keywordController,
+                      decoration: const InputDecoration(
+                        label: Text('기억할 키워드를 입력해주세요', style: TextStyle(fontSize: 20)),
+                        hintText: '한 단어 입력 후 엔터!',
+                        hintStyle: TextStyle(fontSize: 13),
                       ),
-                      const SizedBox(height: 20),
-                      Expanded(child: KeywordsWidget(controller: keywordWidgetController)),
-                    ],
-                  ),
-                ],
-              ),
+                      onSubmitted: (val) {
+                        val = val.trim();
+                        if (val.isEmpty) return;
+                        keywordWidgetController.addKeyword(val);
+                        keywordController.clear();
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    Expanded(child: KeywordsWidget(controller: keywordWidgetController)),
+                  ],
+                ),
+              ],
             ),
           ),
         ),

@@ -64,7 +64,7 @@ class KeywordCard extends StatelessWidget {
         children: [
           Flexible(child: Text(keyword, style: kLargeTextStyle)),
           const SizedBox(width: 10),
-          const Icon(FontAwesomeIcons.x),
+          const Icon(FontAwesomeIcons.xmark),
         ],
       ),
     );

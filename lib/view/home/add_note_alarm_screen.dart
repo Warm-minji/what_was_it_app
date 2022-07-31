@@ -142,6 +142,9 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
                       alignment: AlignmentDirectional.centerEnd,
                       child: InkWell(
                         onTap: () {
+                          // 반복성 알람은 1회만 설정 가능
+                          if (isAlarmTypeRepeatable && _alarmController.getAlarmList().length == 1) return;
+
                           // 30*개월 + 일
                           int alarm = _monthController.getCurrentIndex() * 30 + _dayController.getCurrentIndex();
                           if (alarm == 0) return;

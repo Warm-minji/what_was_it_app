@@ -32,19 +32,20 @@ class _KeywordsWidgetState extends State<KeywordsWidget> {
         itemBuilder: (context, idx) {
           return Column(
             children: [
-              (idx < keywords.length) ?
-              SizedBox(
-                height: 50,
-                child: Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  child: GestureDetector(
-                    onTap: () {
-                      widget.controller.removeKeyword(idx);
-                    },
-                    child: KeywordCard(keyword: keywords[idx]),
-                  ),
-                ),
-              ) : const SizedBox(height: 50),
+              (idx < keywords.length)
+                  ? SizedBox(
+                      height: 50,
+                      child: Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: GestureDetector(
+                          onTap: () {
+                            widget.controller.removeKeyword(idx);
+                          },
+                          child: KeywordCard(keyword: keywords[idx]),
+                        ),
+                      ),
+                    )
+                  : const SizedBox(height: 50),
               const Divider(height: 0, thickness: 3),
             ],
           );
@@ -63,7 +64,13 @@ class KeywordCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
       child: Row(
         children: [
-          Flexible(child: Text(keyword, style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor))),
+          Flexible(
+            child: Text(
+              keyword,
+              style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
           const SizedBox(width: 10),
           Icon(FontAwesomeIcons.eraser, color: Theme.of(context).primaryColor),
         ],

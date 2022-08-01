@@ -54,60 +54,19 @@ class _AddNoteWidgetState extends ConsumerState<AddNoteScreen> with SingleTicker
   @override
   Widget build(BuildContext context) {
     return NoTitleFrameView(
-      body: SizedBox(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        child: Stack(
-          children: [
-            Column(
-              children: [
-                SizedBox(
-                  height: 50,
-                  child: Align(
-                    alignment: AlignmentDirectional.center,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Hero(
-                          tag: 'addNoteAlarm',
-                          child: Text(
-                            '기억 메모장',
-                            style: TextStyle(
-                              fontSize: 22,
-                              color: Theme.of(context).primaryColor,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.none,
-                              fontFamily: 'GowunDodum',
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Icon(FontAwesomeIcons.pencil, color: Theme.of(context).primaryColor),
-                      ],
-                    ),
-                  ),
-                ),
-                const Divider(thickness: 3, height: 0),
-                SizedBox(
-                  height: 50,
-                  child: TextField(
-                    controller: titleController,
-                    style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor),
-                    decoration: const InputDecoration(
-                      labelText: '',
-                      hintText: '기억할 주제 입력!',
-                      prefixIcon: Icon(Icons.arrow_forward),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 50),
-                const Divider(thickness: 3, height: 0),
-                SizedBox(
-                  height: 50,
-                  child: Align(
-                    alignment: AlignmentDirectional.center,
+      body: Column(
+        children: [
+          SizedBox(
+            height: 50,
+            child: Align(
+              alignment: AlignmentDirectional.center,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Hero(
+                    tag: 'addNoteAlarm',
                     child: Text(
-                      '관련 키워드 목록',
+                      '기억 메모장',
                       style: TextStyle(
                         fontSize: 22,
                         color: Theme.of(context).primaryColor,
@@ -117,31 +76,64 @@ class _AddNoteWidgetState extends ConsumerState<AddNoteScreen> with SingleTicker
                       ),
                     ),
                   ),
-                ),
-                const Divider(thickness: 3, height: 0),
-                SizedBox(
-                  height: 50,
-                  child: TextField(
-                    controller: keywordController,
-                    style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor),
-                    decoration: const InputDecoration(
-                      labelText: '',
-                      hintText: '키워드 입력 후 엔터!',
-                      prefixIcon: Icon(Icons.arrow_forward),
-                    ),
-                    onSubmitted: (val) {
-                      val = val.trim();
-                      if (val.isEmpty) return;
-                      keywordWidgetController.addKeyword(val);
-                      keywordController.clear();
-                    },
-                  ),
-                ),
-                Expanded(child: KeywordsWidget(controller: keywordWidgetController)),
-              ],
+                  const SizedBox(width: 10),
+                  Icon(FontAwesomeIcons.pencil, color: Theme.of(context).primaryColor),
+                ],
+              ),
             ),
-          ],
-        ),
+          ),
+          const Divider(thickness: 3, height: 0),
+          SizedBox(
+            height: 50,
+            child: TextField(
+              controller: titleController,
+              style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor),
+              decoration: const InputDecoration(
+                labelText: '',
+                hintText: '기억할 주제 입력!',
+                prefixIcon: Icon(Icons.arrow_forward),
+              ),
+            ),
+          ),
+          const SizedBox(height: 50),
+          const Divider(thickness: 3, height: 0),
+          SizedBox(
+            height: 50,
+            child: Align(
+              alignment: AlignmentDirectional.center,
+              child: Text(
+                '관련 키워드 목록',
+                style: TextStyle(
+                  fontSize: 22,
+                  color: Theme.of(context).primaryColor,
+                  fontWeight: FontWeight.bold,
+                  decoration: TextDecoration.none,
+                  fontFamily: 'GowunDodum',
+                ),
+              ),
+            ),
+          ),
+          const Divider(thickness: 3, height: 0),
+          SizedBox(
+            height: 50,
+            child: TextField(
+              controller: keywordController,
+              style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor),
+              decoration: const InputDecoration(
+                labelText: '',
+                hintText: '키워드 입력 후 엔터!',
+                prefixIcon: Icon(Icons.arrow_forward),
+              ),
+              onSubmitted: (val) {
+                val = val.trim();
+                if (val.isEmpty) return;
+                keywordWidgetController.addKeyword(val);
+                keywordController.clear();
+              },
+            ),
+          ),
+          Expanded(child: KeywordsWidget(controller: keywordWidgetController)),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {

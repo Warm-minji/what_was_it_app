@@ -34,7 +34,7 @@ class _ScrollListViewState extends State<ScrollListView> {
         itemExtent: itemHeight,
         physics: const FixedExtentScrollPhysics(),
         overAndUnderCenterOpacity: 0.6,
-        diameterRatio: 1.5,
+        diameterRatio: 1.8,
         perspective: 0.01,
         onSelectedItemChanged: (idx) => widget.controller.setCurrentIndex(idx),
         childDelegate: ListWheelChildBuilderDelegate(

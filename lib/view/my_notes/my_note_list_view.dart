@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:what_was_it_app/core/provider.dart';
 import 'package:what_was_it_app/core/theme.dart';
 import 'package:what_was_it_app/model/note.dart';
 import 'package:what_was_it_app/view/component/no_title_frame_view.dart';
 import 'package:what_was_it_app/view/component/note_detail_view.dart';
 
-class MyNoteListView extends StatelessWidget {
-  MyNoteListView({Key? key, required this.noteList}) : super(key: key);
-
-  final List<Note> noteList;
-  int showDetailIndex = -1;
+class MyNoteListView extends ConsumerWidget {
+  MyNoteListView({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, ref) {
+    List<Note> noteList = ref.watch(noteRepoProvider);
+
     return NoTitleFrameView(
       body: Column(
         children: [
@@ -39,7 +40,39 @@ class MyNoteListView extends StatelessWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => NoTitleFrameView(body: NoteDetailView(note: note))),
+                        MaterialPageRoute(
+                          builder: (context) => NoTitleFrameView(
+                            body: NoteDetailView(note: note),
+                            floatingActionButton: FloatingActionButton(
+                              child: const Icon(FontAwesomeIcons.trash),
+                              onPressed: () async {
+                                await showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text('잠시만요!'),
+                                    content: const Text('정말 삭제하시겠어요?\n되돌릴 수 없습니다!'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          ref.read(noteRepoProvider.notifier).removeNote(idx);
+                                          Navigator.pop(context);
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('네!'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('아니요!'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
                       );
                     },
                     child: ListTile(

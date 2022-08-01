@@ -43,7 +43,7 @@ class HomeScreen extends ConsumerWidget {
               Note? note = await Navigator.push(context, MaterialPageRoute(builder: (context) => const AddNoteScreen()));
               if (note == null) return;
 
-              ref.read(noteRepoProvider).saveNote(note);
+              ref.read(noteRepoProvider.notifier).saveNote(note);
             },
             child: IconCardWidget(icon: Icons.add_circle_outline, title: '기억 노트 추가하기'),
           ),
@@ -52,9 +52,7 @@ class HomeScreen extends ConsumerWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MyNoteListView(
-                    noteList: ref.read(noteRepoProvider).getNoteList(),
-                  ),
+                  builder: (context) => MyNoteListView(),
                 ),
               );
             },

@@ -5,6 +5,7 @@ import 'package:what_was_it_app/core/provider.dart';
 import 'package:what_was_it_app/model/note.dart';
 import 'package:what_was_it_app/view/home/add_note_screen.dart';
 import 'package:what_was_it_app/view/component/icon_card_widget.dart';
+import 'package:what_was_it_app/view/my_notes/my_note_list_view.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -47,7 +48,16 @@ class HomeScreen extends ConsumerWidget {
             child: IconCardWidget(icon: Icons.add_circle_outline, title: '기억 노트 추가하기'),
           ),
           InkWell(
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MyNoteListView(
+                    noteList: ref.read(noteRepoProvider).getNoteList(),
+                  ),
+                ),
+              );
+            },
             child: IconCardWidget(icon: Icons.notes, title: '내 기억 노트 확인하기'),
           ),
         ],

@@ -153,14 +153,20 @@ class _AddNoteWidgetState extends ConsumerState<AddNoteScreen> with SingleTicker
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
+        onPressed: () async {
           if (titleController.text.trim().isEmpty || keywordWidgetController.getKeywords().isEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('주제와 키워드를 모두 입력해주세요')));
             return;
           }
           ref.read(AddNoteScreen.addNoteDataProvider)['title'] = titleController.text;
           ref.read(AddNoteScreen.addNoteDataProvider)['keywords'] = keywordWidgetController.getKeywords();
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const AddNoteAlarmScreen()));
+          Navigator.pop(
+            context,
+            await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AddNoteAlarmScreen()),
+            ),
+          );
         },
         child: const Icon(FontAwesomeIcons.angleRight),
       ),

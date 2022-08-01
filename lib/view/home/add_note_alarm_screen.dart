@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:what_was_it_app/core/theme.dart';
+import 'package:what_was_it_app/model/note.dart';
 import 'package:what_was_it_app/view/component/alarm_list_view.dart';
 import 'package:what_was_it_app/view/component/scroll_list_view.dart';
+import 'package:what_was_it_app/view/home/add_note_screen.dart';
 
 class AddNoteAlarmScreen extends ConsumerStatefulWidget {
   const AddNoteAlarmScreen({Key? key}) : super(key: key);
@@ -16,6 +20,8 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
   final ScrollListViewController _monthController = ScrollListViewController();
   final ScrollListViewController _dayController = ScrollListViewController();
   final AlarmListViewController _alarmController = AlarmListViewController();
+
+  final TextEditingController _categoryController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +51,24 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
                     const SizedBox(height: 20),
                     const Align(
                       alignment: AlignmentDirectional.centerStart,
-                      child: Text('알람 타입을 선택해주세요'),
+                      child: Text('카테고리를 입력해주세요.'),
+                    ),
+                    SizedBox(
+                      height: 50,
+                      child: TextField(
+                        controller: _categoryController,
+                        style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor),
+                        decoration: const InputDecoration(
+                          labelText: '',
+                          hintText: '카테고리 입력!',
+                          prefixIcon: Icon(Icons.arrow_forward),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    const Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Text('알람 타입을 선택해주세요.'),
                     ),
                     const SizedBox(height: 10),
                     Row(
@@ -177,7 +200,30 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // TODO
+          isFormEmpty() => (_categoryController.text.isEmpty || _alarmController.getAlarmList().isEmpty);
+
+          if (isFormEmpty()) {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('카테고리와 알람을 모두 입력해주세요.')));
+            return;
+          }
+
+          final data = ref.read(AddNoteScreen.addNoteDataProvider);
+          data['category'] = _categoryController.text;
+          data['alarmPeriods'] = _alarmController.getAlarmList();
+          data['isRepeatable'] = isAlarmTypeRepeatable;
+          data['pubDate'] = DateTime.now();
+
+          Navigator.pop(
+            context,
+            Note(
+              title: data['title'],
+              category: data['category'],
+              keywords: data['keywords'],
+              alarmPeriods: data['alarmPeriods'],
+              isRepeatable: data['isRepeatable'],
+              pubDate: data['pubDate'],
+            ),
+          );
         },
         child: const Icon(Icons.send),
       ),

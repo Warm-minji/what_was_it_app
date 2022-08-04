@@ -128,7 +128,7 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
                 const Divider(thickness: 2),
                 const Align(
                   alignment: AlignmentDirectional.centerStart,
-                  child: Text('알람 주기를 입력해주세요.\n일회성 알람은 설정한 날에 1회만 작동합니다.\n[주의] 반복성 알람은 한 주기만 설정할 수 있습니다.'),
+                  child: Text('알람 주기를 입력해주세요.\n[주의] 반복성 알람은 한 주기만 설정할 수 있습니다.'),
                 ),
                 SizedBox(
                   height: 200,

@@ -12,8 +12,8 @@ final noteProvider = StateProvider(
     title: "",
     category: "",
     keywords: [],
-    alarmPeriods: [],
-    isRepeatable: false,
+    scheduleDates: [],
+    repeatType: null,
     pubDate: DateTime.now(),
   ),
 );

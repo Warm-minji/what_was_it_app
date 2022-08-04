@@ -29,8 +29,8 @@ class _AlarmListViewState extends State<AlarmListView> {
       child: Row(
         children: [
           ...widget.controller.getAlarmList().map((e) {
-            int month = e ~/ 30;
-            int day = e % 30;
+            final now = DateTime.now();
+            int day = e.difference(DateTime(now.year, now.month, now.day)).inDays;
 
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -42,7 +42,8 @@ class _AlarmListViewState extends State<AlarmListView> {
                 child: Row(
                   children: [
                     Text(
-                      '${(month != 0) ? '$month개월 ' : ''}${(day != 0) ? '$day일 ' : ''}후',
+                      // '${(month != 0) ? '$month개월 ' : ''}'
+                      '${(day != 0) ? '$day일 ' : ''}후',
                       style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
                     ),
                     const SizedBox(width: 10),
@@ -64,13 +65,13 @@ class _AlarmListViewState extends State<AlarmListView> {
 }
 
 class AlarmListViewController extends ChangeNotifier {
-  final List<int> _alarmList = [];
+  final List<DateTime> _alarmList = [];
 
   AlarmListViewController();
 
-  List<int> getAlarmList() => _alarmList;
+  List<DateTime> getAlarmList() => _alarmList;
 
-  void addAlarm(int alarm) {
+  void addAlarm(DateTime alarm) {
     if (_alarmList.contains(alarm)) {
       return;
     }
@@ -79,7 +80,7 @@ class AlarmListViewController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void removeAlarm(int alarm) {
+  void removeAlarm(DateTime alarm) {
     _alarmList.remove(alarm);
     notifyListeners();
   }

@@ -10,6 +10,8 @@ void main() async {
   prefs = await SharedPreferences.getInstance();
   // TODO onboarding check
 
+  // await prefs.clear(); // clear all
+
   runApp(const MyApp());
 }
 

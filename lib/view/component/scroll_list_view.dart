@@ -68,11 +68,14 @@ class ScrollListItem extends StatelessWidget {
   }
 }
 
-class ScrollListViewController {
+class ScrollListViewController extends ChangeNotifier {
   int _currentIdx = 0;
 
   ScrollListViewController();
 
   int getCurrentIndex() => _currentIdx;
-  void setCurrentIndex(int idx) => _currentIdx = idx;
+  void setCurrentIndex(int idx) {
+    _currentIdx = idx;
+    notifyListeners();
+  }
 }

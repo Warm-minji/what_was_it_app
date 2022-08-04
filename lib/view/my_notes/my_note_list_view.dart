@@ -58,13 +58,13 @@ class MyNoteListView extends ConsumerWidget {
                                           Navigator.pop(context);
                                           Navigator.pop(context);
                                         },
-                                        child: const Text('네!'),
+                                        child: const Text('네'),
                                       ),
                                       TextButton(
                                         onPressed: () {
                                           Navigator.pop(context);
                                         },
-                                        child: const Text('아니요!'),
+                                        child: const Text('아니요'),
                                       ),
                                     ],
                                   ),

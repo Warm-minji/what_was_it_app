@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
             backgroundColor: primaryColor,
           ),
         ),
-        home: const Intro(),
+        home: Intro(),
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
         supportedLocales: const [
           Locale('ko', 'KR'),

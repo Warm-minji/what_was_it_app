@@ -3,7 +3,7 @@
    <application
         android:label="기억하다"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/what_was_it_icon">
         <activity
             android:name=".MainActivity"
             android:exported="true"

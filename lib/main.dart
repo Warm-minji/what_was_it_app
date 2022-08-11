@@ -24,7 +24,7 @@ void main() async {
 Future _initializeNotification() async {
   tz.initializeTimeZones();
   tz.setLocalLocation(tz.getLocation("Asia/Seoul"));
-  const AndroidInitializationSettings androidInitializationSettings = AndroidInitializationSettings('app_icon');
+  const AndroidInitializationSettings androidInitializationSettings = AndroidInitializationSettings('@mipmap/what_was_it_icon');
   const IOSInitializationSettings iosInitializationSettings = IOSInitializationSettings();
   const InitializationSettings initializationSettings = InitializationSettings(
     android: androidInitializationSettings,

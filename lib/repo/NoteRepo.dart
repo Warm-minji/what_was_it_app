@@ -82,7 +82,7 @@ class NoteRepo extends StateNotifier<List<Note>> {
 
     await flutterLocalNotificationsPlugin.zonedSchedule(
       notificationId,
-      "${note.title} 기억 나시나요?",
+      "[기억하다] ${note.title} 기억 나시나요?",
       note.keywords.reduce((value, element) => "$value, $element"),
       scheduledDate,
       _getNotificationDetails(),

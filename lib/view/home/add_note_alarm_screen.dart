@@ -1,16 +1,11 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
-import 'package:what_was_it_app/core/date_functions.dart';
 import 'package:what_was_it_app/core/theme.dart';
 import 'package:what_was_it_app/model/note.dart';
 import 'package:what_was_it_app/view/component/alarm_list_view.dart';
 import 'package:what_was_it_app/view/component/no_title_frame_view.dart';
-import 'package:what_was_it_app/view/component/scroll_list_view.dart';
 import 'package:what_was_it_app/view/home/add_note_screen.dart';
 
 class AddNoteAlarmScreen extends ConsumerStatefulWidget {

@@ -10,6 +10,7 @@ class Note {
   final List<DateTime> scheduleDates;
   final RepeatType repeatType; // no repeat iff this value is null
   final DateTime pubDate;
+  List<int>? notificationId;
 
   Note({
     required this.title,
@@ -18,6 +19,7 @@ class Note {
     required this.scheduleDates,
     required this.repeatType,
     required this.pubDate,
+    this.notificationId,
   });
 
   factory Note.fromJson(Map<String, dynamic> json) => _$NoteFromJson(json);

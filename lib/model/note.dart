@@ -8,7 +8,7 @@ class Note {
   final String category;
   final List<String> keywords;
   final List<DateTime> scheduleDates;
-  final RepeatType? repeatType; // no repeat iff this value is null
+  final RepeatType repeatType; // no repeat iff this value is null
   final DateTime pubDate;
 
   Note({
@@ -26,6 +26,7 @@ class Note {
 }
 
 enum RepeatType {
+  none,
   daily,
   weekly,
   monthly,

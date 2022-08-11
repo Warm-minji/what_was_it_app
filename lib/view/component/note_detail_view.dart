@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:what_was_it_app/core/date_functions.dart';
 import 'package:what_was_it_app/core/theme.dart';
 import 'package:what_was_it_app/model/note.dart';
 
 class NoteDetailView extends StatelessWidget {
-  NoteDetailView({Key? key, required this.note}) : super(key: key);
+  const NoteDetailView({Key? key, required this.note}) : super(key: key);
 
   final Note note;
 
@@ -70,17 +71,16 @@ class NoteDetailView extends StatelessWidget {
           child: Align(
             alignment: AlignmentDirectional.centerStart,
             child: Text(
-              '알람 종류 : ${(note.repeatType != null) ? '반복성 알람' : '일회성 알람'}',
+              '알람 종류 : ${(note.repeatType != RepeatType.none) ? '반복성 알람' : '일회성 알람'}',
               style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor),
               overflow: TextOverflow.ellipsis,
             ),
           ),
         ),
         const Divider(thickness: 3, height: 0),
-        SizedBox(
-          height: 50,
-          child: (note.repeatType == null)
-              ? Row(
+        if (note.repeatType == RepeatType.none) SizedBox(
+                height: 50,
+                child: Row(
                   children: [
                     Text(
                       '시작일로부터',
@@ -94,9 +94,7 @@ class NoteDetailView extends StatelessWidget {
                         scrollDirection: Axis.horizontal,
                         itemCount: note.scheduleDates.length,
                         itemBuilder: (context, idx) {
-                          DateTime schedule = note.scheduleDates[idx];
-
-                          int day = schedule.difference(DateTime(note.pubDate.year, note.pubDate.month, note.pubDate.day)).inDays;
+                          int offset = getOffset(note.scheduleDates[idx], note.pubDate);
 
                           return Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -107,7 +105,7 @@ class NoteDetailView extends StatelessWidget {
                               ),
                               child: Text(
                                 // '${(month != 0) ? '$month개월 ' : ''}'
-                                '$day일 후',
+                                '$offset일 후',
                                 style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
                               ),
                             ),
@@ -116,14 +114,30 @@ class NoteDetailView extends StatelessWidget {
                       ),
                     ),
                   ],
-                )
-              : Align(
-                  child: Text(
-                    getDescOfPeriodicAlarm(note),
-                    style: kLargeTextStyle.copyWith(color: Theme.of(context).primaryColor),
-                  ),
                 ),
-        ),
+              ) else Column(
+                children: [
+                  SizedBox(
+                    height: 50,
+                    child: Align(
+                      child: Text(
+                        _getDescOfPeriodicAlarm(note).split("\n")[0],
+                        style: kLargeTextStyle.copyWith(color: Theme.of(context).primaryColor),
+                      ),
+                    ),
+                  ),
+                  const Divider(thickness: 3, height: 0),
+                  SizedBox(
+                    height: 50,
+                    child: Align(
+                      child: Text(
+                        _getDescOfPeriodicAlarm(note).split("\n")[1],
+                        style: kLargeTextStyle.copyWith(color: Theme.of(context).primaryColor),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
         const Divider(thickness: 3, height: 0),
         const SizedBox(height: 50),
         const Divider(thickness: 3, height: 0),
@@ -180,42 +194,18 @@ class NoteDetailView extends StatelessWidget {
     );
   }
 
-  String formatDate(DateTime date) {
-    return '${date.year}년 ${date.month}월 ${date.day}일';
-  }
-
-  String getDescOfPeriodicAlarm(Note note) {
-    if (note.repeatType == null) return "";
-
-    switch (note.repeatType!) {
+  String _getDescOfPeriodicAlarm(Note note) {
+    switch (note.repeatType) {
+      case RepeatType.none:
+        return "";
       case RepeatType.daily:
-        return "매일 반복";
+        return "${formatDate(note.scheduleDates[0])}부터\n매일 반복";
       case RepeatType.weekly:
-        return "매주 ${weekDayToString(note.scheduleDates[0].weekday)}요일마다 반복";
+        return "${formatDate(note.scheduleDates[0])}부터\n매주 ${weekDayToString(note.scheduleDates[0].weekday)}요일마다 반복";
       case RepeatType.monthly:
-        return "매달 ${note.scheduleDates[0].day}일마다 반복";
+        return "${formatDate(note.scheduleDates[0])}부터\n매달 ${note.scheduleDates[0].day}일마다 반복";
       case RepeatType.yearly:
-        return "매년 ${note.scheduleDates[0].month}월 ${note.scheduleDates[0].day}일마다 반복";
+        return "${formatDate(note.scheduleDates[0])}부터\n매년 ${note.scheduleDates[0].month}월 ${note.scheduleDates[0].day}일마다 반복";
     }
-  }
-
-  String weekDayToString(int weekDay) {
-    switch (weekDay) {
-      case 0:
-        return "일";
-      case 1:
-        return "월";
-      case 2:
-        return "화";
-      case 3:
-        return "수";
-      case 4:
-        return "목";
-      case 5:
-        return "금";
-      case 6:
-        return "토";
-    }
-    throw Exception('weekDay must >= 0 and <= 6');
   }
 }

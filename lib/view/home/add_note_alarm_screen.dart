@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
+import 'package:what_was_it_app/core/date_functions.dart';
 import 'package:what_was_it_app/core/theme.dart';
 import 'package:what_was_it_app/model/note.dart';
 import 'package:what_was_it_app/view/component/alarm_list_view.dart';
@@ -20,40 +22,18 @@ class AddNoteAlarmScreen extends ConsumerStatefulWidget {
 
 class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
   bool isAlarmTypeRepeatable = false;
-  RepeatType repeatType = RepeatType.daily;
+  RepeatType repeatType = RepeatType.none;
   DateTime alarmStartsAt = DateTime.now();
-  final ScrollListViewController _monthController = ScrollListViewController();
-  final ScrollListViewController _dayController = ScrollListViewController();
-  final AlarmListViewController _alarmController = AlarmListViewController();
 
+  final AlarmListViewController _alarmController = AlarmListViewController();
   final TextEditingController _categoryController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    _monthController.addListener(() {
-      SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-        setState(() {
-          alarmStartsAt = DateTime.now().add(Duration(days: _monthController.getCurrentIndex() * 30 + _dayController.getCurrentIndex()));
-        });
-      });
-    });
-    _dayController.addListener(() {
-      SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-        setState(() {
-          alarmStartsAt = DateTime.now().add(Duration(days: _monthController.getCurrentIndex() * 30 + _dayController.getCurrentIndex()));
-        });
-      });
-    });
-  }
+  final now = DateTime.now();
 
   @override
   void dispose() {
-    _monthController.dispose();
-    _dayController.dispose();
     _alarmController.dispose();
     _categoryController.dispose();
-
     super.dispose();
   }
 
@@ -105,7 +85,7 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
                           setState(() {
                             if (!isAlarmTypeRepeatable) {
                               isAlarmTypeRepeatable = true;
-                              _alarmController.clear();
+                              repeatType = RepeatType.daily;
                             }
                           });
                         },
@@ -133,7 +113,7 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
                           setState(() {
                             if (isAlarmTypeRepeatable) {
                               isAlarmTypeRepeatable = false;
-                              _alarmController.clear();
+                              repeatType = RepeatType.none;
                             }
                           });
                         },
@@ -161,67 +141,42 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
                 const Divider(thickness: 2),
                 const Align(
                   alignment: AlignmentDirectional.centerStart,
-                  child: Text('알람 주기를 입력해주세요'),
+                  child: Text('알람 주기를 선택해주세요.'),
                 ),
-                SizedBox(
-                  height: 200,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: ScrollListView(
-                          controller: _monthController,
-                          item: [
-                            ...[for (int i = 0; i <= 12; i++) i].map((e) => '$e개월')
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      Expanded(
-                        child: ScrollListView(
-                          controller: _dayController,
-                          item: [
-                            ...[for (int i = 0; i <= 30; i++) i].map((e) => '$e일')
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                SfDateRangePicker(
+                  selectionMode: (isAlarmTypeRepeatable) ? DateRangePickerSelectionMode.single : DateRangePickerSelectionMode.multiple,
+                  enablePastDates: false,
+                  showNavigationArrow: true,
+                  onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
+                    if (isAlarmTypeRepeatable) {
+                      DateTime selected = args.value as DateTime;
+                      setState(() {
+                        alarmStartsAt = selected;
+                      });
+                    } else {
+                      List<DateTime> selected = args.value as List<DateTime>;
+                      _alarmController.setAlarmList(selected);
+                    }
+                  },
                 ),
-                if (!isAlarmTypeRepeatable)
-                  Align(
-                    alignment: AlignmentDirectional.centerEnd,
-                    child: InkWell(
-                      onTap: () {
-                        // 반복성 알람은 1회만 설정 가능
-                        if (isAlarmTypeRepeatable && _alarmController.getAlarmList().length == 1) return;
-
-                        DateTime alarm = getDateAfter(_monthController.getCurrentIndex(), _dayController.getCurrentIndex());
-                        final now = DateTime.now();
-                        if (alarm.difference(DateTime(now.year, now.month, now.day)).inDays == 0) return;
-
-                        _alarmController.addAlarm(alarm);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text('알람 추가하기', style: TextStyle(color: Theme.of(context).primaryColor)),
-                            Icon(Icons.arrow_right_alt, color: Theme.of(context).primaryColor),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
                 const Divider(thickness: 2),
                 const SizedBox(height: 10),
                 if (isAlarmTypeRepeatable)
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        "'${alarmStartsAt.month}월 ${alarmStartsAt.day}일'부터  ",
-                        style: kLargeTextStyle.copyWith(color: Theme.of(context).primaryColor),
+                      InkWell(
+                        onTap: () async {
+                          DateTime? selected = await showDatePicker(context: context, initialDate: now, firstDate: now, lastDate: DateTime(2200));
+                          if (selected == null) return;
+                          setState(() {
+                            alarmStartsAt = selected;
+                          });
+                        },
+                        child: Text(
+                          "'${alarmStartsAt.month}월 ${alarmStartsAt.day}일'부터  ",
+                          style: kLargeTextStyle.copyWith(color: Theme.of(context).primaryColor),
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -246,7 +201,7 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
                       Text("반복", style: kLargeTextStyle.copyWith(color: Theme.of(context).primaryColor)),
                     ],
                   ),
-                AlarmListView(controller: _alarmController),
+                if (!isAlarmTypeRepeatable) AlarmListView(controller: _alarmController),
                 const SizedBox(height: 10),
                 const Divider(thickness: 2),
               ],
@@ -266,13 +221,9 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
           final data = ref.read(AddNoteScreen.addNoteDataProvider);
 
           data['category'] = _categoryController.text;
-          data['scheduleDates'] = (isAlarmTypeRepeatable)
-              ? [
-                  getDateAfter(_monthController.getCurrentIndex(), _dayController.getCurrentIndex()),
-                ]
-              : _alarmController.getAlarmList();
-          data['repeatType'] = (isAlarmTypeRepeatable) ? repeatType : null;
-          data['pubDate'] = DateTime.now();
+          data['scheduleDates'] = (isAlarmTypeRepeatable) ? [alarmStartsAt] : _alarmController.getAlarmList();
+          data['repeatType'] = repeatType;
+          data['pubDate'] = now;
 
           Navigator.pop(
             context,
@@ -290,13 +241,4 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
       ),
     );
   }
-}
-
-DateTime getDateAfter(int month, int day) {
-  var date = DateTime.now();
-  return DateTime(
-    date.year,
-    date.month + month,
-    date.day + day,
-  );
 }

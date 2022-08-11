@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:what_was_it_app/core/date_functions.dart';
 
 class AlarmListView extends StatefulWidget {
   const AlarmListView({Key? key, required this.controller}) : super(key: key);
@@ -28,36 +29,41 @@ class _AlarmListViewState extends State<AlarmListView> {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          ...widget.controller.getAlarmList().map((e) {
-            final now = DateTime.now();
-            int day = e.difference(DateTime(now.year, now.month, now.day)).inDays;
-
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 5),
-              child: Container(
-                padding: const EdgeInsets.all(8.0),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Theme.of(context).primaryColor),
+          ...widget.controller.getAlarmList().map(
+            (e) {
+              String date = "";
+              if (e.year == DateTime.now().year) {
+                date = "${e.month}월 ${e.day}일";
+              } else {
+                date = formatDate(e);
+              }
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                child: Container(
+                  padding: const EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Theme.of(context).primaryColor),
+                  ),
+                  child: Row(
+                    children: [
+                      Text(
+                        // '${(month != 0) ? '$month개월 ' : ''}'
+                        date,
+                        style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
+                      ),
+                      // const SizedBox(width: 10),
+                      // InkWell(
+                      //   onTap: () {
+                      //     widget.controller.removeAlarm(e);
+                      //   },
+                      //   child: Icon(FontAwesomeIcons.xmark, color: Theme.of(context).primaryColor),
+                      // ),
+                    ],
+                  ),
                 ),
-                child: Row(
-                  children: [
-                    Text(
-                      // '${(month != 0) ? '$month개월 ' : ''}'
-                      '${(day != 0) ? '$day일 ' : ''}후',
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
-                    ),
-                    const SizedBox(width: 10),
-                    InkWell(
-                      onTap: () {
-                        widget.controller.removeAlarm(e);
-                      },
-                      child: Icon(FontAwesomeIcons.xmark, color: Theme.of(context).primaryColor),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          })
+              );
+            },
+          ),
         ],
       ),
     );
@@ -70,6 +76,13 @@ class AlarmListViewController extends ChangeNotifier {
   AlarmListViewController();
 
   List<DateTime> getAlarmList() => _alarmList;
+
+  void setAlarmList(List<DateTime> list) {
+    _alarmList.clear();
+    _alarmList.addAll(list);
+    _alarmList.sort();
+    notifyListeners();
+  }
 
   void addAlarm(DateTime alarm) {
     if (_alarmList.contains(alarm)) {

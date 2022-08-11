@@ -13,6 +13,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   cupertino_icons: ^1.0.2
   font_awesome_flutter: ^10.1.0
@@ -21,6 +23,7 @@ dependencies:
   flutter_riverpod: ^1.0.4
   clickable_list_wheel_view: ^0.1.0
   shared_preferences: ^2.0.15
+  syncfusion_flutter_datepicker: ^20.2.40
 
 
 dev_dependencies:

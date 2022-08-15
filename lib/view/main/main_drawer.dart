@@ -5,9 +5,32 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:what_was_it_app/core/notification_plugin.dart';
 import 'package:what_was_it_app/core/shared_preferences.dart';
 import 'package:what_was_it_app/core/theme.dart';
+import 'package:what_was_it_app/view/main/main_drawer_item.dart';
 
-class MainDrawer extends StatelessWidget {
+class MainDrawer extends StatefulWidget {
   const MainDrawer({Key? key}) : super(key: key);
+
+  @override
+  State<MainDrawer> createState() => _MainDrawerState();
+}
+
+class _MainDrawerState extends State<MainDrawer> {
+  bool isServerLive = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkServer();
+  }
+
+  Future _checkServer() async {
+    await Future.delayed(const Duration(seconds: 1));
+    if (mounted) {
+      setState(() {
+        isServerLive = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +43,7 @@ class MainDrawer extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 70),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Align(
@@ -41,6 +65,42 @@ class MainDrawer extends StatelessWidget {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 20),
+                    const Divider(thickness: 1, height: 0),
+                    MainDrawerItem(
+                      onTap: () {
+                        // TODO
+                      },
+                      child: const Text("도움말"),
+                    ),
+                    const Divider(thickness: 1, height: 0),
+                    MainDrawerItem(
+                      onTap: () {
+                        // TODO
+                      },
+                      child: const Text("통계 보기"),
+                    ),
+                    const Divider(thickness: 1, height: 0),
+                    MainDrawerItem(
+                      onTap: () {
+                        // TODO
+                      },
+                      child: Text(
+                        "기억 백업하기",
+                        style: (isServerLive) ? null : const TextStyle(decoration: TextDecoration.lineThrough),
+                      ),
+                    ),
+                    const Divider(thickness: 1, height: 0),
+                    MainDrawerItem(
+                      onTap: () {
+                        // TODO
+                      },
+                      child: Text(
+                        "기억 복구하기",
+                        style: (isServerLive) ? null : const TextStyle(decoration: TextDecoration.lineThrough),
+                      ),
+                    ),
+                    const Divider(thickness: 1, height: 0),
                   ],
                 ),
               ),
@@ -91,9 +151,14 @@ class MainDrawer extends StatelessWidget {
     );
   }
 
+  Future _setUserAlarmTime(Time alarmTime) async {
+    await prefs.setStringList("alarmTime", [
+      ...[alarmTime.hour, alarmTime.minute, alarmTime.second].map((e) => e.toString()),
+    ]);
+  }
+
   showSettings(context) {
     showDialog(
-      barrierDismissible: false,
       context: context,
       builder: (context) {
         Time userAlarmTime = getUserAlarmTime();
@@ -104,6 +169,8 @@ class MainDrawer extends StatelessWidget {
         hourController.text = "${userAlarmTime.hour}";
         minController.text = "${userAlarmTime.minute}".padLeft(2, "0");
 
+        String msg = "";
+
         return SimpleDialog(
           contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           children: [
@@ -111,9 +178,6 @@ class MainDrawer extends StatelessWidget {
               alignment: AlignmentDirectional.centerEnd,
               child: InkWell(
                 onTap: () {
-                  userAlarmTime = getUserAlarmTime();
-                  hourController.text = "${userAlarmTime.hour}";
-                  minController.text = "${userAlarmTime.minute}".padLeft(2, "0");
                   Navigator.pop(context);
                 },
                 child: const Padding(
@@ -122,86 +186,113 @@ class MainDrawer extends StatelessWidget {
                 ),
               ),
             ),
-            StatefulBuilder(
-              builder: (context, setState) => Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Icon(FontAwesomeIcons.clock),
-                      SizedBox(width: 10),
-                      Text("알림 시각 설정하기", style: kLargeTextStyle),
-                    ],
-                  ),
-                  Row(
+            SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: StatefulBuilder(
+                builder: (context, setState) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: TextField(
-                          controller: hourController,
-                          textAlign: TextAlign.center,
-                          onChanged: (val) {
-                            val = val.trim();
-                            if (val.isNotEmpty) {
-                              int? newHour = int.tryParse(val);
-                              if (newHour == null || (newHour < 0 || newHour >= 24)) {
-                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("시간은 0~23까지의 숫자만 입력할 수 있습니다.")));
-                                setState(() {
-                                  hourController.text = userAlarmTime.hour.toString();
-                                });
-                                FocusScope.of(context).unfocus();
-                                return;
-                              }
-
-                              setState(() {
-                                userAlarmTime = Time(newHour, userAlarmTime.minute);
-                              });
-                            }
-                          },
-                        ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Icon(FontAwesomeIcons.clock),
+                          SizedBox(width: 10),
+                          Text("알림 시각 설정하기", style: kLargeTextStyle),
+                        ],
                       ),
-                      const Text(":", style: kLargeTextStyle),
-                      Expanded(
-                        child: TextField(
-                          controller: minController,
-                          textAlign: TextAlign.center,
-                          onChanged: (val) {
-                            val = val.trim();
-                            if (val.isNotEmpty) {
-                              int? newMinute = int.tryParse(val);
-                              if (newMinute == null || (newMinute < 0 || newMinute >= 60)) {
-                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("분은 0~59까지의 숫자만 입력할 수 있습니다.")));
-                                setState(() {
-                                  hourController.text = userAlarmTime.minute.toString();
-                                });
-                                FocusScope.of(context).unfocus();
-                                return;
-                              }
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: hourController,
+                              textAlign: TextAlign.center,
+                              onChanged: (val) {
+                                val = val.trim();
+                                if (val.isNotEmpty) {
+                                  if (val.length > 2) {
+                                    msg = "두 숫자만 입력할 수 있습니다.";
+                                    hourController.text = userAlarmTime.hour.toString();
+                                    FocusScope.of(context).unfocus();
+                                    return;
+                                  }
+                                  int? newHour = int.tryParse(val);
+                                  if (newHour == null || (newHour < 0 || newHour >= 24)) {
+                                    setState(() {
+                                      msg = "시간은 0~23까지의 숫자만 입력할 수 있습니다.";
+                                      hourController.text = userAlarmTime.hour.toString();
+                                    });
+                                    FocusScope.of(context).unfocus();
+                                    return;
+                                  }
 
-                              setState(() {
-                                userAlarmTime = Time(userAlarmTime.hour, newMinute);
-                              });
-                            }
+                                  setState(() {
+                                    msg = "";
+                                    userAlarmTime = Time(newHour, userAlarmTime.minute);
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                          const Text(":", style: kLargeTextStyle),
+                          Expanded(
+                            child: TextField(
+                              controller: minController,
+                              textAlign: TextAlign.center,
+                              onChanged: (val) {
+                                val = val.trim();
+                                if (val.isNotEmpty) {
+                                  if (val.length > 2) {
+                                    msg = "두 숫자만 입력할 수 있습니다.";
+                                    minController.text = userAlarmTime.minute.toString().padLeft(2, "0");
+                                    FocusScope.of(context).unfocus();
+                                    return;
+                                  }
+                                  int? newMinute = int.tryParse(val);
+                                  if (newMinute == null || (newMinute < 0 || newMinute >= 60)) {
+                                    setState(() {
+                                      msg = "분은 0~59까지의 숫자만 입력할 수 있습니다.";
+                                      minController.text = userAlarmTime.minute.toString().padLeft(2, "0");
+                                    });
+                                    FocusScope.of(context).unfocus();
+                                    return;
+                                  }
+
+                                  setState(() {
+                                    msg = "";
+                                    userAlarmTime = Time(userAlarmTime.hour, newMinute);
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Text("${userAlarmTime.hour}시 ${userAlarmTime.minute.toString().padLeft(2, "0")}분에 알림이 전송됩니다."),
+                      Text(msg, style: TextStyle(color: Theme.of(context).primaryColor)),
+                      const SizedBox(height: 20),
+                      Align(
+                        alignment: AlignmentDirectional.centerEnd,
+                        child: InkWell(
+                          onTap: () {
+                            _setUserAlarmTime(userAlarmTime);
+                            Navigator.pop(context);
                           },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text("저장하기", style: TextStyle(color: Theme.of(context).primaryColor)),
+                          ),
                         ),
                       ),
                     ],
-                  ),
-                  const SizedBox(height: 10),
-                  Text("${userAlarmTime.hour}시 ${userAlarmTime.minute.toString().padLeft(2, "0")}분에 알림이 전송됩니다."),
-                  const SizedBox(height: 20),
-                ],
+                  );
+                },
               ),
             ),
           ],
         );
       },
     );
-
-    Future _setUserAlarmTime(Time alarmTime) async {
-      await prefs.setStringList("alarmTime", [
-        ...[alarmTime.hour, alarmTime.minute, alarmTime.second].map((e) => e.toString()),
-      ]);
-    }
   }
 }

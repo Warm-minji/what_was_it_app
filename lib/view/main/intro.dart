@@ -36,7 +36,7 @@ class _IntroState extends State<Intro> with SingleTickerProviderStateMixin {
   }
 
   void moveNextPage(context) {
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
   }
 
   @override

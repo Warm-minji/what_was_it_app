@@ -19,7 +19,9 @@ class _IntroState extends State<Intro> with SingleTickerProviderStateMixin {
     _animationController.addListener(() {
       setState(() {});
       if (_animationController.isCompleted) {
-        if (mounted) Future.delayed(const Duration(seconds: 2), () => moveNextPage(context));
+        Future.delayed(const Duration(seconds: 2), () {
+          if (mounted) moveNextPage(context);
+        });
       }
     });
     _opacityAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeInCubic));

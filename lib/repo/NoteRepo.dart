@@ -37,7 +37,10 @@ class NoteRepo extends StateNotifier<List<Note>> {
 
   Future _removeNotification(Note note) async {
     if (note.notificationId != null && note.notificationId!.isNotEmpty) {
-      note.notificationId!.map((e) async => await flutterLocalNotificationsPlugin.cancel(e));
+      // TODO map 관련 확인
+      for (int notificationId in note.notificationId!) {
+        await flutterLocalNotificationsPlugin.cancel(notificationId);
+      }
 
       for (tz.TZDateTime scheduledDate in _getNoteAlarmDate(note)) {
         print("$scheduledDate에 알람이 삭제되었습니다."); // Test

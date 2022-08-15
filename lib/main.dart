@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:what_was_it_app/core/notification_plugin.dart';
@@ -18,7 +19,7 @@ void main() async {
   // await prefs.clear(); // clear all
   await _initializeNotification();
 
-  runApp(const MyApp());
+  runApp(Phoenix(child: const MyApp()));
 }
 
 Future _initializeNotification() async {

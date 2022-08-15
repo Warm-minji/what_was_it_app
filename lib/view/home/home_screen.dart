@@ -10,6 +10,7 @@ import 'package:what_was_it_app/core/theme.dart';
 import 'package:what_was_it_app/model/note.dart';
 import 'package:what_was_it_app/view/home/add_note_screen.dart';
 import 'package:what_was_it_app/view/component/icon_card_widget.dart';
+import 'package:what_was_it_app/view/main/main_drawer.dart';
 import 'package:what_was_it_app/view/my_notes/my_note_list_view.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -20,6 +21,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   late Time userAlarmTime;
   final TextEditingController _hourController = TextEditingController();
   final TextEditingController _minController = TextEditingController();
@@ -45,16 +47,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
+        leading: InkWell(
+          onTap: () {
+            _scaffoldKey.currentState!.openDrawer();
+          },
+          child: const Icon(FontAwesomeIcons.bars),
+        ),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            InkWell(
-              onTap: () {
-                // TODO
-              },
-              child: const Icon(FontAwesomeIcons.bars),
-            ),
+            const SizedBox.shrink(),
             InkWell(
               onTap: () {
                 showDialog(
@@ -211,6 +215,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ],
       ),
+      drawer: const MainDrawer(),
     );
   }
 }

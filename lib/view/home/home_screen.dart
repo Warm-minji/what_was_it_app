@@ -24,16 +24,12 @@ class HomeScreen extends ConsumerWidget {
           },
           child: const Icon(FontAwesomeIcons.bars),
         ),
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const SizedBox.shrink(),
-            InkWell(
-              onTap: () {},
-              child: const Icon(FontAwesomeIcons.bell),
-            ),
-          ],
-        ),
+        actions: [
+          InkWell(
+            onTap: () {},
+            child: ConstrainedBox(constraints: const BoxConstraints(minWidth: kToolbarHeight, minHeight: kToolbarHeight), child: const Icon(FontAwesomeIcons.bell)),
+          ),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(110),
           child: IconCardWidget(icon: FontAwesomeIcons.handshake, title: '반갑습니다', subtitle: '잊으셔도 괜찮아요. 같이 기억해요.', textColor: Colors.white),

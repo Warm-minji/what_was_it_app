@@ -56,8 +56,7 @@ class MainDrawer extends StatelessWidget {
                       onTap: () async {
                         await showDialog(
                             context: context,
-                            builder: (context) =>
-                                AlertDialog(
+                            builder: (context) => AlertDialog(
                                   title: const Text("잠시만요"),
                                   content: const Text("되돌릴 수 없습니다. 정말 삭제할까요?"),
                                   actions: [
@@ -81,7 +80,7 @@ class MainDrawer extends StatelessWidget {
                       child: const Text("모든 데이터 삭제하기", style: TextStyle(color: Colors.red)),
                     ),
                     const SizedBox(height: 10),
-                    const Text('©2022. WarmMinji. All rights reserved.'),
+                    const Text('©2022. WarmMinji. All rights reserved.', style: TextStyle(fontSize: 12)),
                   ],
                 ),
               ),
@@ -189,7 +188,7 @@ class MainDrawer extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 10),
-                  Text("${userAlarmTime.hour}시 ${userAlarmTime.minute.toString().padLeft(2, "0")}분에 알람이 울립니다."),
+                  Text("${userAlarmTime.hour}시 ${userAlarmTime.minute.toString().padLeft(2, "0")}분에 알림이 전송됩니다."),
                   const SizedBox(height: 20),
                 ],
               ),

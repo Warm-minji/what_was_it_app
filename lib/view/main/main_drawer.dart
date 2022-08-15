@@ -56,26 +56,27 @@ class MainDrawer extends StatelessWidget {
                       onTap: () async {
                         await showDialog(
                             context: context,
-                            builder: (context) => AlertDialog(
-                              title: const Text("잠시만요"),
-                              content: const Text("되돌릴 수 없습니다. 정말 삭제할까요?"),
-                              actions: [
-                                TextButton(
-                                  onPressed: () async {
-                                    await flutterLocalNotificationsPlugin.cancelAll();
-                                    await prefs.clear();
-                                    Phoenix.rebirth(context);
-                                  },
-                                  child: const Text("삭제", style: TextStyle(color: Colors.red)),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text("취소"),
-                                ),
-                              ],
-                            ));
+                            builder: (context) =>
+                                AlertDialog(
+                                  title: const Text("잠시만요"),
+                                  content: const Text("되돌릴 수 없습니다. 정말 삭제할까요?"),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () async {
+                                        await flutterLocalNotificationsPlugin.cancelAll();
+                                        await prefs.clear();
+                                        if (mounted) Phoenix.rebirth(context);
+                                      },
+                                      child: const Text("삭제", style: TextStyle(color: Colors.red)),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text("취소"),
+                                    ),
+                                  ],
+                                ));
                       },
                       child: const Text("모든 데이터 삭제하기", style: TextStyle(color: Colors.red)),
                     ),

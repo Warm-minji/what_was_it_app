@@ -7,7 +7,7 @@ class Note {
   final String title;
   final String category;
   final List<String> keywords;
-  final List<DateTime> scheduleDates;
+  final List<DateTime> scheduledDates;
   final RepeatType repeatType; // no repeat iff this value is null
   final DateTime pubDate;
   List<int>? notificationId;
@@ -16,7 +16,7 @@ class Note {
     required this.title,
     required this.category,
     required this.keywords,
-    required this.scheduleDates,
+    required this.scheduledDates,
     required this.repeatType,
     required this.pubDate,
     this.notificationId,

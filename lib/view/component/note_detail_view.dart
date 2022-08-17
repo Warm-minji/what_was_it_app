@@ -92,9 +92,9 @@ class NoteDetailView extends StatelessWidget {
                       child: ListView.builder(
                         padding: const EdgeInsets.symmetric(vertical: 5),
                         scrollDirection: Axis.horizontal,
-                        itemCount: note.scheduleDates.length,
+                        itemCount: note.scheduledDates.length,
                         itemBuilder: (context, idx) {
-                          int offset = getOffset(note.scheduleDates[idx], note.pubDate);
+                          int offset = getOffset(note.scheduledDates[idx], note.pubDate);
 
                           return Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 5),

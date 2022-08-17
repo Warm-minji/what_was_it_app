@@ -119,7 +119,7 @@ class _UpcomingAlarmListViewState extends ConsumerState<UpcomingAlarmListView> {
                 for (var item in snapshot.data!) {
                   for (var note in noteList) {
                     if (note.notificationId?.contains(item.id) ?? false) {
-                      upcomingAlarmList.add(AlarmNote(note: note, scheduledDate: note.scheduleDates[note.notificationId!.indexOf(item.id)]));
+                      upcomingAlarmList.add(AlarmNote(note: note, scheduledDate: note.scheduledDates[note.notificationId!.indexOf(item.id)]));
                       break;
                     }
                   }

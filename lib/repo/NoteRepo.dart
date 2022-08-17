@@ -113,7 +113,7 @@ class NoteRepo extends StateNotifier<List<Note>> {
   List<tz.TZDateTime> _getNoteAlarmDate(Note note) {
     List<tz.TZDateTime> result = [];
 
-    for (DateTime alarmDate in note.scheduleDates) {
+    for (DateTime alarmDate in note.scheduledDates) {
       // TODO 알람 시각 유저가 정하도록
       final scheduledDate = tz.TZDateTime(tz.local, alarmDate.year, alarmDate.month, alarmDate.day, alarmDate.hour, alarmDate.minute);
       result.add(scheduledDate);

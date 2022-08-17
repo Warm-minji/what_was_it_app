@@ -238,7 +238,7 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
                 title: data['title'],
                 category: data['category'],
                 keywords: data['keywords'],
-                scheduleDates: data['scheduleDates'],
+                scheduledDates: data['scheduleDates'],
                 repeatType: data['repeatType'],
                 pubDate: data['pubDate'],
               ),

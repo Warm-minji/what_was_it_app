@@ -11,7 +11,7 @@ Note _$NoteFromJson(Map<String, dynamic> json) => Note(
       category: json['category'] as String,
       keywords:
           (json['keywords'] as List<dynamic>).map((e) => e as String).toList(),
-      scheduleDates: (json['scheduleDates'] as List<dynamic>)
+      scheduledDates: (json['scheduledDates'] as List<dynamic>)
           .map((e) => DateTime.parse(e as String))
           .toList(),
       repeatType: $enumDecode(_$RepeatTypeEnumMap, json['repeatType']),
@@ -25,8 +25,8 @@ Map<String, dynamic> _$NoteToJson(Note instance) => <String, dynamic>{
       'title': instance.title,
       'category': instance.category,
       'keywords': instance.keywords,
-      'scheduleDates':
-          instance.scheduleDates.map((e) => e.toIso8601String()).toList(),
+      'scheduledDates':
+          instance.scheduledDates.map((e) => e.toIso8601String()).toList(),
       'repeatType': _$RepeatTypeEnumMap[instance.repeatType]!,
       'pubDate': instance.pubDate.toIso8601String(),
       'notificationId': instance.notificationId,

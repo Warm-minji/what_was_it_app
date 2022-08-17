@@ -12,7 +12,7 @@ final noteProvider = StateProvider(
     title: "",
     category: "",
     keywords: [],
-    scheduleDates: [],
+    scheduledDates: [],
     repeatType: RepeatType.none,
     pubDate: DateTime.now(),
   ),

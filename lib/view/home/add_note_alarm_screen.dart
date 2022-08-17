@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
@@ -205,7 +206,7 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
+        onPressed: () async {
           isFormEmpty() => (_categoryController.text.isEmpty || (!isAlarmTypeRepeatable && _alarmController.getAlarmList().isEmpty));
 
           if (isFormEmpty()) {
@@ -220,20 +221,158 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
           data['repeatType'] = repeatType;
           data['pubDate'] = now;
 
-          Navigator.pop(
-            context,
-            Note(
-              title: data['title'],
-              category: data['category'],
-              keywords: data['keywords'],
-              scheduleDates: data['scheduleDates'],
-              repeatType: data['repeatType'],
-              pubDate: data['pubDate'],
-            ),
-          );
+          final Time? alarmTime = await showSettings(context);
+          if (alarmTime == null) return;
+
+          List<DateTime> scheduleDates = data["scheduleDates"];
+          List<DateTime> alarmTimeAppliedDates = [];
+          for (DateTime date in scheduleDates) {
+            alarmTimeAppliedDates.add(DateTime(date.year, date.month, date.day, alarmTime.hour, alarmTime.minute));
+          }
+          data["scheduleDates"] = alarmTimeAppliedDates;
+
+          if (mounted) {
+            Navigator.pop(
+              context,
+              Note(
+                title: data['title'],
+                category: data['category'],
+                keywords: data['keywords'],
+                scheduleDates: data['scheduleDates'],
+                repeatType: data['repeatType'],
+                pubDate: data['pubDate'],
+              ),
+            );
+          }
         },
         child: const Icon(Icons.send),
       ),
+    );
+  }
+
+  showSettings(context) async {
+    return await showDialog(
+      context: context,
+      builder: (context) {
+        Time alarmTime = const Time(9, 0);
+
+        final TextEditingController hourController = TextEditingController();
+        final TextEditingController minController = TextEditingController();
+
+        hourController.text = "${alarmTime.hour}";
+        minController.text = "${alarmTime.minute}".padLeft(2, "0");
+
+        String msg = "";
+
+        return SimpleDialog(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          children: [
+            SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: StatefulBuilder(
+                builder: (context, setState) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Icon(FontAwesomeIcons.clock),
+                          SizedBox(width: 10),
+                          Text("알림 시각 설정하기", style: kLargeTextStyle),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: hourController,
+                              textAlign: TextAlign.center,
+                              onChanged: (val) {
+                                val = val.trim();
+                                if (val.isNotEmpty) {
+                                  if (val.length > 2) {
+                                    msg = "두 숫자만 입력할 수 있습니다.";
+                                    hourController.text = alarmTime.hour.toString();
+                                    FocusScope.of(context).unfocus();
+                                    return;
+                                  }
+                                  int? newHour = int.tryParse(val);
+                                  if (newHour == null || (newHour < 0 || newHour >= 24)) {
+                                    setState(() {
+                                      msg = "시간은 0~23까지의 숫자만 입력할 수 있습니다.";
+                                      hourController.text = alarmTime.hour.toString();
+                                    });
+                                    FocusScope.of(context).unfocus();
+                                    return;
+                                  }
+
+                                  setState(() {
+                                    msg = "";
+                                    alarmTime = Time(newHour, alarmTime.minute);
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                          const Text(":", style: kLargeTextStyle),
+                          Expanded(
+                            child: TextField(
+                              controller: minController,
+                              textAlign: TextAlign.center,
+                              onChanged: (val) {
+                                val = val.trim();
+                                if (val.isNotEmpty) {
+                                  if (val.length > 2) {
+                                    msg = "두 숫자만 입력할 수 있습니다.";
+                                    minController.text = alarmTime.minute.toString().padLeft(2, "0");
+                                    FocusScope.of(context).unfocus();
+                                    return;
+                                  }
+                                  int? newMinute = int.tryParse(val);
+                                  if (newMinute == null || (newMinute < 0 || newMinute >= 60)) {
+                                    setState(() {
+                                      msg = "분은 0~59까지의 숫자만 입력할 수 있습니다.";
+                                      minController.text = alarmTime.minute.toString().padLeft(2, "0");
+                                    });
+                                    FocusScope.of(context).unfocus();
+                                    return;
+                                  }
+
+                                  setState(() {
+                                    msg = "";
+                                    alarmTime = Time(alarmTime.hour, newMinute);
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Text("${alarmTime.hour}시 ${alarmTime.minute.toString().padLeft(2, "0")}분에 알림이 전송됩니다."),
+                      Text(msg, style: TextStyle(color: Theme.of(context).primaryColor)),
+                      const SizedBox(height: 20),
+                      Align(
+                        alignment: AlignmentDirectional.centerEnd,
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.pop(context, alarmTime);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text("완료", style: TextStyle(color: Theme.of(context).primaryColor)),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

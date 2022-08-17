@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:what_was_it_app/core/notification_plugin.dart';
+import 'package:what_was_it_app/core/provider.dart';
 import 'package:what_was_it_app/core/shared_preferences.dart';
-import 'package:what_was_it_app/core/theme.dart';
 import 'package:what_was_it_app/view/main/main_drawer_item.dart';
 
-class MainDrawer extends StatefulWidget {
+class MainDrawer extends ConsumerStatefulWidget {
   const MainDrawer({Key? key}) : super(key: key);
 
   @override
-  State<MainDrawer> createState() => _MainDrawerState();
+  ConsumerState<MainDrawer> createState() => _MainDrawerState();
 }
 
-class _MainDrawerState extends State<MainDrawer> {
+class _MainDrawerState extends ConsumerState<MainDrawer> {
   bool isServerLive = false;
 
   @override
@@ -24,10 +24,10 @@ class _MainDrawerState extends State<MainDrawer> {
   }
 
   Future _checkServer() async {
-    await Future.delayed(const Duration(seconds: 1));
+    final check = await ref.read(noteRepoProvider.notifier).checkServerConnection();
     if (mounted) {
       setState(() {
-        isServerLive = false;
+        isServerLive = check;
       });
     }
   }

@@ -7,8 +7,11 @@ import 'package:what_was_it_app/core/shared_preferences.dart';
 import 'package:what_was_it_app/model/note.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:http/http.dart' as http;
 
 class NoteRepo extends StateNotifier<List<Note>> {
+  static const String host = "15.164.144.82:8080";
+
   NoteRepo(List<Note> list) : super(list);
 
   void saveNote(Note note) async {
@@ -33,6 +36,22 @@ class NoteRepo extends StateNotifier<List<Note>> {
     state = [...state];
 
     prefs.setString('notes', jsonEncode(state));
+  }
+
+  Future<bool> checkServerConnection() async {
+    final url = Uri.http(host, "/");
+    final client = http.Client();
+
+    bool check = false;
+    final res = await client.get(url).timeout(const Duration(seconds: 3), onTimeout: () {
+      check = false;
+      return http.Response("request timeout", 408);
+    });
+
+    // TODO 404로 체크하는 방법 말고 괜찮은 방법이 있을까..
+    if (res.statusCode == 404) check = true;
+
+    return check;
   }
 
   Future _removeNotification(Note note) async {

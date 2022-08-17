@@ -26,7 +26,7 @@ dependencies:
   syncfusion_flutter_datepicker: ^20.2.40
   flutter_local_notifications: ^9.7.0
   flutter_phoenix: ^1.0.0
-
+  http: ^0.13.5
 
 dev_dependencies:
   flutter_test:

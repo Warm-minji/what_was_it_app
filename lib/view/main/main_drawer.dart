@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,6 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:what_was_it_app/core/notification_plugin.dart';
 import 'package:what_was_it_app/core/provider.dart';
 import 'package:what_was_it_app/core/shared_preferences.dart';
+import 'package:what_was_it_app/core/theme.dart';
 import 'package:what_was_it_app/view/main/main_drawer_item.dart';
 
 class MainDrawer extends ConsumerStatefulWidget {
@@ -82,8 +85,10 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                     ),
                     const Divider(thickness: 1, height: 0),
                     MainDrawerItem(
-                      onTap: () {
-                        // TODO
+                      onTap: () async {
+                        if (!isServerLive) return;
+
+                        await showLoginDialog(context, saveMode: true);
                       },
                       child: Text(
                         "기억 백업하기",
@@ -150,4 +155,105 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
       ),
     );
   }
+
+  Future showLoginDialog(context, {saveMode}) async {
+    String userId = "";
+    String password = "";
+
+    await showDialog(
+        context: context,
+        builder: (context) {
+          String msg = "";
+          const idMsg = "5~12 글자로 입력해주세요";
+          const pwMsg = "6~20 글자로 입력해주세요";
+
+          return SimpleDialog(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            children: [
+              SizedBox(
+                width: MediaQuery.of(context).size.width,
+                child: StatefulBuilder(
+                  builder: (context, setState) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: const [
+                            Icon(FontAwesomeIcons.clock),
+                            SizedBox(width: 10),
+                            Text("백업/복원하기", style: kLargeTextStyle),
+                          ],
+                        ),
+                        TextField(
+                          decoration: InputDecoration(
+                            labelText: "아이디",
+                            counterText: idMsg,
+                          ),
+                          onChanged: (val) {
+                            userId = val.trim();
+                          },
+                        ),
+                        TextField(
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            labelText: "비밀번호",
+                            counterText: pwMsg,
+                          ),
+                          onChanged: (val) {
+                            password = val.trim();
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        Text(msg),
+                        Align(
+                          alignment: AlignmentDirectional.centerEnd,
+                          child: InkWell(
+                            onTap: () async {
+                              if (userId.isEmpty || password.isEmpty) {
+                                setState(() {
+                                  msg = "아이디 비밀번호를 모두 입력해주세요";
+                                });
+                                return;
+                              }
+                              if (userId.length < 5 || userId.length > 12) {
+                                setState(() {
+                                  msg = "아이디는 $idMsg";
+                                });
+                                return;
+                              }
+                              if (password.length < 6 || password.length > 20) {
+                                setState(() {
+                                  msg = "비밀번호는 $pwMsg";
+                                });
+                                return;
+                              }
+                              if (saveMode) {
+                                try {
+                                  await ref.read(noteRepoProvider.notifier).saveToRemote(userId, password, ref.read(noteRepoProvider));
+                                } on HttpException catch(e) {
+                                  setState(() {
+                                    msg = e.message;
+                                  });
+                                }
+                              } else {
+
+                              }
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text("확인", style: TextStyle(color: Theme.of(context).primaryColor)),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ],
+          );
+        });
+  }
+
 }

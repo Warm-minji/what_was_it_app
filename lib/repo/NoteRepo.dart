@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -52,6 +53,48 @@ class NoteRepo extends StateNotifier<List<Note>> {
     if (res.statusCode == 404) check = true;
 
     return check;
+  }
+
+  Future saveToRemote(String userId, String password, List<Note> notes) async {
+    final url = Uri.http(host, "/api/backup");
+    final req = http.Request("POST", url);
+    req.headers[HttpHeaders.contentTypeHeader] = "application/json";
+
+    List<Map<String, dynamic>> listNotes = [];
+
+    List<dynamic> mapNotes = jsonDecode(jsonEncode(notes));
+    for (Map<String, dynamic> mapNote in mapNotes) {
+      mapNote["memberId"] = userId;
+      switch (mapNote["repeatType"]) {
+        case "none":
+          mapNote["repeatType"] = "NONE";
+          break;
+        case "daily":
+          mapNote["repeatType"] = "DAILY";
+          break;
+        case "weekly":
+          mapNote["repeatType"] = "WEEKLY";
+          break;
+        case "monthly":
+          mapNote["repeatType"] = "MONTHLY";
+          break;
+        case "yearly":
+          mapNote["repeatType"] = "YEARLY";
+          break;
+      }
+      listNotes.add(mapNote);
+    }
+
+    req.body = jsonEncode({
+      "memberId": userId,
+      "password": password,
+      "notes": listNotes,
+    });
+
+    final res = await req.send();
+    if (res.statusCode != 200) {
+      throw HttpException(jsonDecode(await res.stream.bytesToString())["errorMessage"]);
+    }
   }
 
   Future _removeNotification(Note note) async {

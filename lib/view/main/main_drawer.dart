@@ -97,8 +97,10 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                     ),
                     const Divider(thickness: 1, height: 0),
                     MainDrawerItem(
-                      onTap: () {
-                        // TODO
+                      onTap: () async {
+                        if (!isServerLive) return;
+
+                        await showLoginDialog(context, saveMode: false);
                       },
                       child: Text(
                         "기억 복구하기",
@@ -231,13 +233,21 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                               if (saveMode) {
                                 try {
                                   await ref.read(noteRepoProvider.notifier).saveToRemote(userId, password, ref.read(noteRepoProvider));
+                                  if (mounted) Navigator.pop(context);
                                 } on HttpException catch(e) {
                                   setState(() {
                                     msg = e.message;
                                   });
                                 }
                               } else {
-
+                                try {
+                                  await ref.read(noteRepoProvider.notifier).loadFromRemote(userId, password);
+                                  if (mounted) Navigator.pop(context);
+                                } on HttpException catch(e) {
+                                  setState(() {
+                                    msg = e.message;
+                                  });
+                                }
                               }
                             },
                             child: Padding(

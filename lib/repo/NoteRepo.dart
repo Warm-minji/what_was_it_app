@@ -55,6 +55,58 @@ class NoteRepo extends StateNotifier<List<Note>> {
     return check;
   }
 
+  Future loadFromRemote(String userId, String password) async {
+    final url = Uri.http(host, "/api/restore", {
+      "memberId": userId,
+      "password": password,
+    });
+    final req = http.Request("GET", url);
+
+    final res = await req.send();
+    if (res.statusCode != 200) {
+      throw HttpException(jsonDecode(await res.stream.bytesToString())["errorMessage"]);
+    }
+
+    List<dynamic> mapNotes = jsonDecode(await res.stream.bytesToString());
+
+    print(mapNotes);
+    List<Map<String, dynamic>> listNotes = [];
+    for (Map<String, dynamic> mapNote in mapNotes) {
+      mapNote["pubDate"] = mapNote["publishedDate"];
+      switch (mapNote["repeatType"]) {
+        case "NONE":
+          mapNote["repeatType"] = "none";
+          break;
+        case "DAILY":
+          mapNote["repeatType"] = "daily";
+          break;
+        case "WEEKLY":
+          mapNote["repeatType"] = "weekly";
+          break;
+        case "MONTHLY":
+          mapNote["repeatType"] = "monthly";
+          break;
+        case "YEARLY":
+          mapNote["repeatType"] = "yearly";
+          break;
+      }
+      listNotes.add(mapNote);
+    }
+
+    List<Note> result = [];
+    for (Map<String, dynamic> mapNote in listNotes) {
+      print(mapNote);
+      result.add(Note.fromJson(mapNote));
+    }
+
+    state = [];
+    await prefs.clear();
+    flutterLocalNotificationsPlugin.cancelAll();
+    for (Note note in result) {
+      saveNote(note);
+    }
+  }
+
   Future saveToRemote(String userId, String password, List<Note> notes) async {
     final url = Uri.http(host, "/api/backup");
     final req = http.Request("POST", url);

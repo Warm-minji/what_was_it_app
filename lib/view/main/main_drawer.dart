@@ -180,7 +180,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: const [
-                            Icon(FontAwesomeIcons.clock),
+                            Icon(FontAwesomeIcons.floppyDisk),
                             SizedBox(width: 10),
                             Text("백업/복원하기", style: kLargeTextStyle),
                           ],

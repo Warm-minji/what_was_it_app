@@ -121,7 +121,7 @@ class NoteDetailView extends StatelessWidget {
                     height: 50,
                     child: Align(
                       child: Text(
-                        _getDescOfPeriodicAlarm(note).split("\n")[0],
+                        getDescOfPeriodicAlarm(note).split("\n")[0],
                         style: kLargeTextStyle.copyWith(color: Theme.of(context).primaryColor),
                       ),
                     ),
@@ -131,7 +131,7 @@ class NoteDetailView extends StatelessWidget {
                     height: 50,
                     child: Align(
                       child: Text(
-                        _getDescOfPeriodicAlarm(note).split("\n")[1],
+                        getDescOfPeriodicAlarm(note).split("\n")[1],
                         style: kLargeTextStyle.copyWith(color: Theme.of(context).primaryColor),
                       ),
                     ),
@@ -192,20 +192,5 @@ class NoteDetailView extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  String _getDescOfPeriodicAlarm(Note note) {
-    switch (note.repeatType) {
-      case RepeatType.none:
-        return "";
-      case RepeatType.daily:
-        return "${formatDate(note.scheduleDates[0])}부터\n매일 반복";
-      case RepeatType.weekly:
-        return "${formatDate(note.scheduleDates[0])}부터\n매주 ${weekDayToString(note.scheduleDates[0].weekday)}요일마다 반복";
-      case RepeatType.monthly:
-        return "${formatDate(note.scheduleDates[0])}부터\n매달 ${note.scheduleDates[0].day}일마다 반복";
-      case RepeatType.yearly:
-        return "${formatDate(note.scheduleDates[0])}부터\n매년 ${note.scheduleDates[0].month}월 ${note.scheduleDates[0].day}일마다 반복";
-    }
   }
 }

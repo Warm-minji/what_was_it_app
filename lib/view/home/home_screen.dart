@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:what_was_it_app/core/notification_plugin.dart';
 import 'package:what_was_it_app/core/provider.dart';
 import 'package:what_was_it_app/model/note.dart';
 import 'package:what_was_it_app/view/home/add_note_screen.dart';
 import 'package:what_was_it_app/view/component/icon_card_widget.dart';
+import 'package:what_was_it_app/view/home/upcoming_alarm_list_view.dart';
 import 'package:what_was_it_app/view/main/main_drawer.dart';
 import 'package:what_was_it_app/view/my_notes/my_note_list_view.dart';
 
@@ -26,7 +28,11 @@ class HomeScreen extends ConsumerWidget {
         ),
         actions: [
           InkWell(
-            onTap: () {},
+            onTap: () async {
+              showModalBottomSheet(context: context, builder: (context) {
+                return UpcomingAlarmListView();
+              });
+            },
             child: ConstrainedBox(constraints: const BoxConstraints(minWidth: kToolbarHeight, minHeight: kToolbarHeight), child: const Icon(FontAwesomeIcons.bell)),
           ),
         ],

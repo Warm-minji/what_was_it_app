@@ -1,3 +1,5 @@
+import 'package:what_was_it_app/model/note.dart';
+
 int getOffsetFromToday(DateTime date) {
   var now = DateTime.now();
   now = DateTime(now.year, now.month, now.day); // remove hours, minutes....
@@ -43,4 +45,19 @@ String weekDayToString(int weekDay) {
       return "토";
   }
   throw Exception('weekDay must >= 0 and <= 6');
+}
+
+String getDescOfPeriodicAlarm(Note note) {
+  switch (note.repeatType) {
+    case RepeatType.none:
+      return "";
+    case RepeatType.daily:
+      return "${formatDate(note.scheduleDates[0])}부터\n매일 반복";
+    case RepeatType.weekly:
+      return "${formatDate(note.scheduleDates[0])}부터\n매주 ${weekDayToString(note.scheduleDates[0].weekday)}요일마다 반복";
+    case RepeatType.monthly:
+      return "${formatDate(note.scheduleDates[0])}부터\n매달 ${note.scheduleDates[0].day}일마다 반복";
+    case RepeatType.yearly:
+      return "${formatDate(note.scheduleDates[0])}부터\n매년 ${note.scheduleDates[0].month}월 ${note.scheduleDates[0].day}일마다 반복";
+  }
 }

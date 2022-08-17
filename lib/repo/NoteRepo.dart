@@ -15,7 +15,7 @@ class NoteRepo extends StateNotifier<List<Note>> {
 
   NoteRepo(List<Note> list) : super(list);
 
-  void saveNote(Note note) async {
+  Future saveNote(Note note) async {
     state = [note, ...state];
 
     int notificationId = _getNextNotificationId();
@@ -101,9 +101,9 @@ class NoteRepo extends StateNotifier<List<Note>> {
 
     state = [];
     await prefs.clear();
-    flutterLocalNotificationsPlugin.cancelAll();
+    await flutterLocalNotificationsPlugin.cancelAll();
     for (Note note in result) {
-      saveNote(note);
+      await saveNote(note);
     }
   }
 

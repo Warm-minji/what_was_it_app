@@ -17,9 +17,9 @@ class UpcomingAlarmListView extends ConsumerStatefulWidget {
 }
 
 class _UpcomingAlarmListViewState extends ConsumerState<UpcomingAlarmListView> {
-  late List<AlarmNote> noRepeatNotes;
-  late List<AlarmNote> repeatNotes;
-  late List<AlarmNote> selectedNotes;
+  List<AlarmNote> noRepeatNotes = [];
+  List<AlarmNote> repeatNotes = [];
+  List<AlarmNote> selectedNotes = [];
 
   bool repeatSelected = false;
 

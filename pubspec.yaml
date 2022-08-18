@@ -28,6 +28,7 @@ dependencies:
   flutter_phoenix: ^1.0.0
   http: ^0.13.5
   url_launcher: ^6.1.5
+  notification_permissions: ^0.6.1
 
 dev_dependencies:
   flutter_test:

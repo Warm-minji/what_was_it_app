@@ -50,25 +50,25 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Align(
-                      alignment: AlignmentDirectional.centerEnd,
-                      child: InkWell(
-                        onTap: () {
-                          // TODO
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(5.0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(FontAwesomeIcons.gear, color: Theme.of(context).primaryColor),
-                              const SizedBox(width: 10),
-                              Text("설정", style: TextStyle(color: Theme.of(context).primaryColor)),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
+                    // Align(
+                    //   alignment: AlignmentDirectional.centerEnd,
+                    //   child: InkWell(
+                    //     onTap: () {
+                    //       // TODO 설정 만들고 주석 해제
+                    //     },
+                    //     child: Padding(
+                    //       padding: const EdgeInsets.all(5.0),
+                    //       child: Row(
+                    //         mainAxisSize: MainAxisSize.min,
+                    //         children: [
+                    //           Icon(FontAwesomeIcons.gear, color: Theme.of(context).primaryColor),
+                    //           const SizedBox(width: 10),
+                    //           Text("설정", style: TextStyle(color: Theme.of(context).primaryColor)),
+                    //         ],
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                     const SizedBox(height: 20),
                     const Divider(thickness: 1, height: 0),
                     MainDrawerItem(
@@ -82,7 +82,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                       onTap: () {
                         // TODO
                       },
-                      child: const Text("통계 보기"),
+                      child: const Text("통계 보기", style: TextStyle(decoration: TextDecoration.lineThrough)),
                     ),
                     const Divider(thickness: 1, height: 0),
                     MainDrawerItem(

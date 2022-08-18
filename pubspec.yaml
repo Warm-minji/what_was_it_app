@@ -27,6 +27,7 @@ dependencies:
   flutter_local_notifications: ^9.7.0
   flutter_phoenix: ^1.0.0
   http: ^0.13.5
+  url_launcher: ^6.1.5
 
 dev_dependencies:
   flutter_test:
@@ -40,7 +41,7 @@ flutter:
   uses-material-design: true
 
   assets:
-    - images/what_was_it_main.png
+    - images/
 
   fonts:
     - family: GowunDodum

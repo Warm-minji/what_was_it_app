@@ -8,6 +8,7 @@ import 'package:what_was_it_app/core/notification_plugin.dart';
 import 'package:what_was_it_app/core/provider.dart';
 import 'package:what_was_it_app/core/shared_preferences.dart';
 import 'package:what_was_it_app/core/theme.dart';
+import 'package:what_was_it_app/view/guide/guide_home.dart';
 import 'package:what_was_it_app/view/main/main_drawer_item.dart';
 
 class MainDrawer extends ConsumerStatefulWidget {
@@ -72,7 +73,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                     const Divider(thickness: 1, height: 0),
                     MainDrawerItem(
                       onTap: () {
-                        // TODO
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const GuideHome()));
                       },
                       child: const Text("도움말"),
                     ),
@@ -265,5 +266,4 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
           );
         });
   }
-
 }

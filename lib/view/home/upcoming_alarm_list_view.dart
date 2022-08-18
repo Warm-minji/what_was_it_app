@@ -155,7 +155,10 @@ class _UpcomingAlarmListViewState extends ConsumerState<UpcomingAlarmListView> {
                         ),
                         subtitle: Text('카테고리 : ${alarmNote.note.category}'),
                         shape: Border.all(color: Theme.of(context).primaryColor),
-                        trailing: Text((repeatSelected) ? getDescOfPeriodicAlarm(alarmNote.note) : dateString),
+                        trailing: Text(
+                          (repeatSelected) ? getDescOfPeriodicAlarm(alarmNote.note) : dateString,
+                          textAlign: TextAlign.right,
+                        ),
                       ),
                     );
                   },

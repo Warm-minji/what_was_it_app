@@ -43,12 +43,12 @@ class NoteRepo extends StateNotifier<List<Note>> {
 
   Future<bool> checkServerConnection() async {
     final url = Uri.http(host, "/");
-    final client = http.Client();
+    final req = http.Request("GET", url);
 
     bool check = false;
-    final res = await client.get(url).timeout(const Duration(seconds: 3), onTimeout: () {
+    final res = await req.send().timeout(const Duration(seconds: 3), onTimeout: () {
       check = false;
-      return http.Response("request timeout", 408);
+      return http.StreamedResponse(Stream.value([]), 408);
     });
 
     // TODO 404로 체크하는 방법 말고 괜찮은 방법이 있을까..
@@ -65,7 +65,9 @@ class NoteRepo extends StateNotifier<List<Note>> {
     });
     final req = http.Request("GET", url);
 
-    final res = await req.send();
+    final res = await req.send().timeout(const Duration(seconds: 3), onTimeout: () {
+      throw Exception("request timeout");
+    });
     if (res.statusCode != 200) {
       throw HttpException(jsonDecode(await res.stream.bytesToString())["errorMessage"]);
     }
@@ -147,7 +149,9 @@ class NoteRepo extends StateNotifier<List<Note>> {
       "notes": listNotes,
     });
 
-    final res = await req.send();
+    final res = await req.send().timeout(const Duration(seconds: 3), onTimeout: () {
+      throw Exception("request timeout");
+    });
     if (res.statusCode != 200) {
       throw HttpException(jsonDecode(await res.stream.bytesToString())["errorMessage"]);
     }

@@ -58,6 +58,7 @@ class NoteRepo extends StateNotifier<List<Note>> {
   }
 
   Future loadFromRemote(String userId, String password) async {
+    // throw Exception("err");
     final url = Uri.http(host, "/api/restore", {
       "memberId": userId,
       "password": password,
@@ -110,6 +111,7 @@ class NoteRepo extends StateNotifier<List<Note>> {
   }
 
   Future saveToRemote(String userId, String password, List<Note> notes) async {
+    // throw Exception("err");
     final url = Uri.http(host, "/api/backup");
     final req = http.Request("POST", url);
     req.headers[HttpHeaders.contentTypeHeader] = "application/json";

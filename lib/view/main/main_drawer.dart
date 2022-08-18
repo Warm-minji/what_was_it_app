@@ -182,14 +182,15 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                       children: [
                         Row(
                           mainAxisSize: MainAxisSize.min,
-                          children: const [
-                            Icon(FontAwesomeIcons.floppyDisk),
-                            SizedBox(width: 10),
-                            Text("백업/복원하기", style: kLargeTextStyle),
+                          children: [
+                            const Icon(FontAwesomeIcons.floppyDisk),
+                            const SizedBox(width: 10),
+                            Text((saveMode) ? "기억 백업하기" : "기억 복구하기", style: kLargeTextStyle),
                           ],
                         ),
+                        if (saveMode) Text("** 백업한 기억은 1회만 복구할 수 있습니다.", style: TextStyle(color: Theme.of(context).primaryColor)),
                         TextField(
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: "아이디",
                             counterText: idMsg,
                           ),
@@ -199,7 +200,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                         ),
                         TextField(
                           obscureText: true,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: "비밀번호",
                             counterText: pwMsg,
                           ),
@@ -234,20 +235,36 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                               if (saveMode) {
                                 try {
                                   await ref.read(noteRepoProvider.notifier).saveToRemote(userId, password, ref.read(noteRepoProvider));
-                                  if (mounted) Navigator.pop(context);
+                                  if (mounted) {
+                                    Navigator.pop(context);
+                                    Navigator.pop(context);
+                                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("백업 완료되었습니다.")));
+                                  }
                                 } on HttpException catch(e) {
                                   setState(() {
                                     msg = e.message;
                                   });
+                                } catch(e) {
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("서버에 문제가 발생했습니다. 개발자에게 문의해주세요.")));
                                 }
                               } else {
                                 try {
                                   await ref.read(noteRepoProvider.notifier).loadFromRemote(userId, password);
-                                  if (mounted) Navigator.pop(context);
+                                  if (mounted) {
+                                    Navigator.pop(context);
+                                    Navigator.pop(context);
+                                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("복구 완료되었습니다.")));
+                                  }
                                 } on HttpException catch(e) {
                                   setState(() {
                                     msg = e.message;
                                   });
+                                } catch(e) {
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("서버에 문제가 발생했습니다. 개발자에게 문의해주세요.")));
                                 }
                               }
                             },

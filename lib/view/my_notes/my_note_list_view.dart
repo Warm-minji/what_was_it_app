@@ -49,7 +49,7 @@ class MyNoteListView extends ConsumerWidget {
                                 await showDialog(
                                   context: context,
                                   builder: (context) => AlertDialog(
-                                    title: const Text('잠시만요!'),
+                                    title: const Text('잠시만요'),
                                     content: const Text('정말 삭제하시겠어요?\n되돌릴 수 없습니다!'),
                                     actions: [
                                       TextButton(

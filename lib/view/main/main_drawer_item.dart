@@ -13,7 +13,7 @@ class MainDrawerItem extends StatelessWidget {
         onTap();
       },
       child: Padding(
-        padding: const EdgeInsets.all(10.0),
+        padding: const EdgeInsets.all(15.0),
         child: Stack(
           children: [
             Row(

@@ -80,7 +80,7 @@ class GuideHome extends StatelessWidget {
               const TextSpan(text: "- "),
               TextSpan(text: "매일 오전 10시", style: accentStyle),
               const TextSpan(text: "마다 마음챙김 명상을 하겠다.\n"),
-              const TextSpan(text: "- 오늘 배운 내용을 "),
+              const TextSpan(text: "- 배운 내용을 "),
               TextSpan(text: "1일 후, 7일 후, 14일 후", style: accentStyle),
               const TextSpan(text: "에 복습하겠다.\n"),
               const TextSpan(text: "- "),
@@ -93,7 +93,7 @@ class GuideHome extends StatelessWidget {
         const Text("위와 같은 상황에 사용하시면 좋습니다."),
         const SizedBox(height: 10),
         const Text("* 알림은 아래와 같이 보입니다."),
-        Image.asset("images/noti_image.png"),
+        Image.asset("images/noti_image.png", fit: BoxFit.fitWidth),
         const Text(" - [iOS 16.0 iPhone] 기준"),
       ],
     );
@@ -137,6 +137,7 @@ class GuideHome extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         const Text("블로그에서 최신 소식을 확인하실 수 있습니다!"),
+        const Text("** 버그 제보 등은 블로그 방명록에 남겨주세요"),
       ],
     );
   }

@@ -251,19 +251,19 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
   }
 
   showSettings(context) async {
+    Time alarmTime = const Time(9, 0);
+
+    final TextEditingController hourController = TextEditingController();
+    final TextEditingController minController = TextEditingController();
+
+    hourController.text = "${alarmTime.hour}";
+    minController.text = "${alarmTime.minute}".padLeft(2, "0");
+
+    String msg = "";
+
     return await showDialog(
       context: context,
       builder: (context) {
-        Time alarmTime = const Time(9, 0);
-
-        final TextEditingController hourController = TextEditingController();
-        final TextEditingController minController = TextEditingController();
-
-        hourController.text = "${alarmTime.hour}";
-        minController.text = "${alarmTime.minute}".padLeft(2, "0");
-
-        String msg = "";
-
         return SimpleDialog(
           contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           children: [
@@ -306,10 +306,14 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
                                     FocusScope.of(context).unfocus();
                                     return;
                                   }
-
                                   setState(() {
                                     msg = "";
                                     alarmTime = Time(newHour, alarmTime.minute);
+                                  });
+                                } else {
+                                  setState(() {
+                                    msg = "";
+                                    alarmTime = Time(0, alarmTime.minute);
                                   });
                                 }
                               },
@@ -338,10 +342,14 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
                                     FocusScope.of(context).unfocus();
                                     return;
                                   }
-
                                   setState(() {
                                     msg = "";
                                     alarmTime = Time(alarmTime.hour, newMinute);
+                                  });
+                                } else {
+                                  setState(() {
+                                    msg = "";
+                                    alarmTime = Time(alarmTime.hour, 0);
                                   });
                                 }
                               },

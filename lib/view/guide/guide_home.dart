@@ -10,23 +10,25 @@ class GuideHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NoTitleFrameView(
-      body: Column(
-        children: [
-          Text(
-            "'기억하다'가 궁금하다",
-            style: TextStyle(fontSize: 22, color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold, decoration: TextDecoration.none, fontFamily: 'GowunDodum'),
-          ),
-          const SizedBox(height: 20),
-          getFirst(context),
-          const SizedBox(height: 10),
-          const Divider(thickness: 2),
-          const SizedBox(height: 10),
-          getSecond(context),
-          const SizedBox(height: 10),
-          const Divider(thickness: 2),
-          const SizedBox(height: 10),
-          getThird(context),
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Text(
+              "'기억하다'가 궁금하다",
+              style: TextStyle(fontSize: 22, color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold, decoration: TextDecoration.none, fontFamily: 'GowunDodum'),
+            ),
+            const SizedBox(height: 20),
+            getFirst(context),
+            const SizedBox(height: 10),
+            const Divider(thickness: 2),
+            const SizedBox(height: 10),
+            getSecond(context),
+            const SizedBox(height: 10),
+            const Divider(thickness: 2),
+            const SizedBox(height: 10),
+            getThird(context),
+          ],
+        ),
       ),
     );
   }

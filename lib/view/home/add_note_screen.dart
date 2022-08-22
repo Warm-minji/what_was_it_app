@@ -88,11 +88,7 @@ class _AddNoteWidgetState extends ConsumerState<AddNoteScreen> with SingleTicker
             child: TextField(
               controller: titleController,
               style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor),
-              decoration: const InputDecoration(
-                labelText: '',
-                hintText: '기억할 주제 입력!',
-                prefixIcon: Icon(Icons.arrow_forward),
-              ),
+              decoration: const InputDecoration(labelText: '', hintText: '기억할 주제 입력!', prefixIcon: Icon(Icons.arrow_forward), contentPadding: EdgeInsets.zero),
             ),
           ),
           const SizedBox(height: 50),
@@ -119,11 +115,7 @@ class _AddNoteWidgetState extends ConsumerState<AddNoteScreen> with SingleTicker
             child: TextField(
               controller: keywordController,
               style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor),
-              decoration: const InputDecoration(
-                labelText: '',
-                hintText: '키워드 입력 후 엔터!',
-                prefixIcon: Icon(Icons.arrow_forward),
-              ),
+              decoration: const InputDecoration(labelText: '', hintText: '키워드 입력 후 엔터!', prefixIcon: Icon(Icons.arrow_forward), contentPadding: EdgeInsets.zero),
               onSubmitted: (val) {
                 val = val.trim();
                 if (val.isEmpty) return;

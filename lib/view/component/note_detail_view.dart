@@ -20,14 +20,17 @@ class NoteDetailView extends StatelessWidget {
             children: [
               Icon(FontAwesomeIcons.noteSticky, color: Theme.of(context).primaryColor),
               const SizedBox(width: 10),
-              Text(
-                note.title,
-                style: TextStyle(
-                  fontSize: 22,
-                  color: Theme.of(context).primaryColor,
-                  fontWeight: FontWeight.bold,
-                  decoration: TextDecoration.none,
-                  fontFamily: 'GowunDodum',
+              Expanded(
+                child: Text(
+                  note.title,
+                  style: TextStyle(
+                    fontSize: 22,
+                    color: Theme.of(context).primaryColor,
+                    fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.none,
+                    fontFamily: 'GowunDodum',
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -42,11 +45,22 @@ class NoteDetailView extends StatelessWidget {
               children: [
                 Icon(Icons.arrow_forward, color: Theme.of(context).primaryColor),
                 const SizedBox(width: 10),
-                Flexible(
-                  child: Text(
-                    '카테고리 : ${note.category}',
-                    style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor),
-                    overflow: TextOverflow.ellipsis,
+                Expanded(
+                  child: Row(
+                    children: [
+                      Text(
+                        '카테고리 : ',
+                        style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Expanded(
+                        child: Text(
+                          note.category,
+                          style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],

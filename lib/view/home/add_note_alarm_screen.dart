@@ -60,11 +60,7 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
                   child: TextField(
                     controller: _categoryController,
                     style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor),
-                    decoration: const InputDecoration(
-                      labelText: '',
-                      hintText: '카테고리 입력!',
-                      prefixIcon: Icon(Icons.arrow_forward),
-                    ),
+                    decoration: const InputDecoration(labelText: '', hintText: '카테고리 입력!', prefixIcon: Icon(Icons.arrow_forward), contentPadding: EdgeInsets.zero),
                   ),
                 ),
                 const SizedBox(height: 10),

@@ -31,7 +31,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.initState();
     NotificationPermissions.getNotificationPermissionStatus().then((perm) {
       if (perm == PermissionStatus.denied || perm == PermissionStatus.unknown) {
-        print(perm);
+        // print(perm);
         SchedulerBinding.instance.addPostFrameCallback((_) async {
           if (mounted) {
             if (Platform.isIOS) {

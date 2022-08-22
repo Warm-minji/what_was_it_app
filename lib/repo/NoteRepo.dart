@@ -74,7 +74,7 @@ class NoteRepo extends StateNotifier<List<Note>> {
 
     List<dynamic> mapNotes = jsonDecode(await res.stream.bytesToString());
 
-    print(mapNotes);
+    // print(mapNotes);
     List<Map<String, dynamic>> listNotes = [];
     for (Map<String, dynamic> mapNote in mapNotes) {
       mapNote["pubDate"] = mapNote["publishedDate"];
@@ -100,7 +100,7 @@ class NoteRepo extends StateNotifier<List<Note>> {
 
     List<Note> result = [];
     for (Map<String, dynamic> mapNote in listNotes) {
-      print(mapNote);
+      // print(mapNote);
       result.add(Note.fromJson(mapNote));
     }
 
@@ -164,9 +164,9 @@ class NoteRepo extends StateNotifier<List<Note>> {
         await flutterLocalNotificationsPlugin.cancel(notificationId);
       }
 
-      for (tz.TZDateTime scheduledDate in _getNoteAlarmDate(note)) {
-        print("$scheduledDate에 알람이 삭제되었습니다."); // Test
-      }
+      // for (tz.TZDateTime scheduledDate in _getNoteAlarmDate(note)) {
+        // print("$scheduledDate에 알람이 삭제되었습니다."); // Test
+      // }
     }
   }
 
@@ -216,7 +216,7 @@ class NoteRepo extends StateNotifier<List<Note>> {
       matchDateTimeComponents: match,
     );
 
-    print("$scheduledDate에 알람이 설정됐습니다."); // Test
+    // print("$scheduledDate에 알람이 설정됐습니다."); // Test
   }
 
   NotificationDetails _getNotificationDetails() {

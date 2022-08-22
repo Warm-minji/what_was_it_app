@@ -78,7 +78,7 @@ class _IntroState extends State<Intro> with SingleTickerProviderStateMixin {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        const Text('©2022. WarmMinji. All rights reserved.'),
+                        const Text('©2022. hi-jin-dev. All rights reserved.'),
                       ],
                     ),
                   ),

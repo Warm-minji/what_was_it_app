@@ -374,14 +374,29 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
                       ),
                       Align(
                         alignment: AlignmentDirectional.centerEnd,
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.pop(context, alarmTime);
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text("완료", style: TextStyle(color: Theme.of(context).primaryColor)),
-                          ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                Navigator.pop(context, alarmTime);
+                              },
+                              child: const Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text("완료", style: TextStyle(color: Colors.red)),
+                              ),
+                            ),
+                            const SizedBox(width: 20),
+                            InkWell(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text("취소", style: TextStyle(color: Theme.of(context).primaryColor)),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],

@@ -96,18 +96,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         content: const Text('알림 기능 사용을 위해\n알림 권한히 필요합니다.'),
                         actions: [
                           TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: const Text('취소'),
-                          ),
-                          TextButton(
                             onPressed: () async {
                               Navigator.pop(context);
                               await NotificationPermissions.requestNotificationPermissions();
                               if (mounted) Phoenix.rebirth(context);
                             },
                             child: const Text('권한 설정하기'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text('취소'),
                           ),
                         ],
                       ),

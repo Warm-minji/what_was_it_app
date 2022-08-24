@@ -212,66 +212,78 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                         Text(msg),
                         Align(
                           alignment: AlignmentDirectional.centerEnd,
-                          child: InkWell(
-                            onTap: () async {
-                              if (userId.isEmpty || password.isEmpty) {
-                                setState(() {
-                                  msg = "아이디 비밀번호를 모두 입력해주세요";
-                                });
-                                return;
-                              }
-                              if (userId.length < 5 || userId.length > 12) {
-                                setState(() {
-                                  msg = "아이디는 $idMsg";
-                                });
-                                return;
-                              }
-                              if (password.length < 6 || password.length > 20) {
-                                setState(() {
-                                  msg = "비밀번호는 $pwMsg";
-                                });
-                                return;
-                              }
-                              if (saveMode) {
-                                try {
-                                  await ref.read(noteRepoProvider.notifier).saveToRemote(userId, password, ref.read(noteRepoProvider));
-                                  if (mounted) {
-                                    Navigator.pop(context);
-                                    Navigator.pop(context);
-                                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("백업 완료되었습니다.")));
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              InkWell(
+                                onTap: () async {
+                                  if (userId.isEmpty || password.isEmpty) {
+                                    setState(() {
+                                      msg = "아이디 비밀번호를 모두 입력해주세요";
+                                    });
+                                    return;
                                   }
-                                } on HttpException catch(e) {
-                                  setState(() {
-                                    msg = e.message;
-                                  });
-                                } catch(e) {
-                                  Navigator.pop(context);
-                                  Navigator.pop(context);
-                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("서버에 문제가 발생했습니다. 개발자에게 문의해주세요.")));
-                                }
-                              } else {
-                                try {
-                                  await ref.read(noteRepoProvider.notifier).loadFromRemote(userId, password);
-                                  if (mounted) {
-                                    Navigator.pop(context);
-                                    Navigator.pop(context);
-                                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("복구 완료되었습니다.")));
+                                  if (userId.length < 5 || userId.length > 12) {
+                                    setState(() {
+                                      msg = "아이디는 $idMsg";
+                                    });
+                                    return;
                                   }
-                                } on HttpException catch(e) {
-                                  setState(() {
-                                    msg = e.message;
-                                  });
-                                } catch(e) {
+                                  if (password.length < 6 || password.length > 20) {
+                                    setState(() {
+                                      msg = "비밀번호는 $pwMsg";
+                                    });
+                                    return;
+                                  }
+                                  if (saveMode) {
+                                    try {
+                                      await ref.read(noteRepoProvider.notifier).saveToRemote(userId, password, ref.read(noteRepoProvider));
+                                      if (mounted) {
+                                        Navigator.pop(context);
+                                        Navigator.pop(context);
+                                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("백업 완료되었습니다.")));
+                                      }
+                                    } on HttpException catch(e) {
+                                      setState(() {
+                                        msg = e.message;
+                                      });
+                                    } catch(e) {
+                                      Navigator.pop(context);
+                                      Navigator.pop(context);
+                                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("서버에 문제가 발생했습니다. 개발자에게 문의해주세요.")));
+                                    }
+                                  } else {
+                                    try {
+                                      await ref.read(noteRepoProvider.notifier).loadFromRemote(userId, password);
+                                      if (mounted) {
+                                        Navigator.pop(context);
+                                        Navigator.pop(context);
+                                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("복구 완료되었습니다.")));
+                                      }
+                                    } on HttpException catch(e) {
+                                      setState(() {
+                                        msg = e.message;
+                                      });
+                                    } catch(e) {
+                                      Navigator.pop(context);
+                                      Navigator.pop(context);
+                                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("서버에 문제가 발생했습니다. 개발자에게 문의해주세요.")));
+                                    }
+                                  }
+                                },
+                                child: const Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text("확인", style: TextStyle(color: Colors.red)),
+                                ),
+                              ),
+                              const SizedBox(width: 20),
+                              InkWell(
+                                onTap: () {
                                   Navigator.pop(context);
-                                  Navigator.pop(context);
-                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("서버에 문제가 발생했습니다. 개발자에게 문의해주세요.")));
-                                }
-                              }
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text("확인", style: TextStyle(color: Theme.of(context).primaryColor)),
-                            ),
+                                },
+                                child: Text("취소", style: TextStyle(color: Theme.of(context).primaryColor)),
+                              ),
+                            ],
                           ),
                         ),
                       ],

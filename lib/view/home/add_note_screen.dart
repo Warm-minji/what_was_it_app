@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:what_was_it_app/core/theme.dart';
@@ -33,6 +34,8 @@ class _AddNoteWidgetState extends ConsumerState<AddNoteScreen> with SingleTicker
 
   late KeywordWidgetController keywordWidgetController;
 
+  bool couldMoveToNext = false;
+
   @override
   void initState() {
     super.initState();
@@ -41,6 +44,15 @@ class _AddNoteWidgetState extends ConsumerState<AddNoteScreen> with SingleTicker
     keywordController = TextEditingController();
 
     keywordWidgetController = KeywordWidgetController();
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+      keywordWidgetController.addListener(() {
+        if (mounted) {
+          setState(() {
+            couldMoveToNext = titleController.text.trim().isNotEmpty && (keywordWidgetController.getKeywords().isNotEmpty || keywordController.text.isNotEmpty);
+          });
+        }
+      });
+    });
   }
 
   @override
@@ -89,6 +101,11 @@ class _AddNoteWidgetState extends ConsumerState<AddNoteScreen> with SingleTicker
               controller: titleController,
               style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor),
               decoration: const InputDecoration(labelText: '', hintText: '기억할 주제 입력!', prefixIcon: Icon(Icons.arrow_forward), contentPadding: EdgeInsets.zero),
+              onChanged: (val) {
+                setState(() {
+                  couldMoveToNext = titleController.text.trim().isNotEmpty && (keywordWidgetController.getKeywords().isNotEmpty || keywordController.text.isNotEmpty);
+                });
+              },
             ),
           ),
           const SizedBox(height: 50),
@@ -116,6 +133,11 @@ class _AddNoteWidgetState extends ConsumerState<AddNoteScreen> with SingleTicker
               controller: keywordController,
               style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor),
               decoration: const InputDecoration(labelText: '', hintText: '키워드 입력 후 엔터!', prefixIcon: Icon(Icons.arrow_forward), contentPadding: EdgeInsets.zero),
+              onChanged: (val) {
+                setState(() {
+                  couldMoveToNext = titleController.text.trim().isNotEmpty && (keywordWidgetController.getKeywords().isNotEmpty || keywordController.text.isNotEmpty);
+                });
+              },
               onSubmitted: (val) {
                 val = val.trim();
                 if (val.isEmpty) return;
@@ -127,28 +149,30 @@ class _AddNoteWidgetState extends ConsumerState<AddNoteScreen> with SingleTicker
           Expanded(child: KeywordsWidget(controller: keywordWidgetController)),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          if (titleController.text.trim().isEmpty || (keywordWidgetController.getKeywords().isEmpty && keywordController.text.isEmpty)) {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('주제와 키워드를 모두 입력해주세요')));
-            return;
-          }
+      floatingActionButton: (couldMoveToNext)
+          ? FloatingActionButton(
+              onPressed: () async {
+                if (!couldMoveToNext) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('주제와 키워드를 모두 입력해주세요')));
+                  return;
+                }
 
-          final val = keywordController.text;
-          if (val.isNotEmpty) keywordWidgetController.addKeyword(val);
+                final val = keywordController.text;
+                if (val.isNotEmpty) keywordWidgetController.addKeyword(val);
 
-          ref.read(AddNoteScreen.addNoteDataProvider)['title'] = titleController.text;
-          ref.read(AddNoteScreen.addNoteDataProvider)['keywords'] = keywordWidgetController.getKeywords();
-          Navigator.pop(
-            context,
-            await Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const AddNoteAlarmScreen()),
-            ),
-          );
-        },
-        child: const Icon(FontAwesomeIcons.angleRight),
-      ),
+                ref.read(AddNoteScreen.addNoteDataProvider)['title'] = titleController.text;
+                ref.read(AddNoteScreen.addNoteDataProvider)['keywords'] = keywordWidgetController.getKeywords();
+                Navigator.pop(
+                  context,
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AddNoteAlarmScreen()),
+                  ),
+                );
+              },
+              child: const Icon(FontAwesomeIcons.angleRight),
+            )
+          : null,
     );
   }
 }

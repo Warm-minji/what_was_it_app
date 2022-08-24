@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -18,6 +19,7 @@ class AddNoteAlarmScreen extends ConsumerStatefulWidget {
 }
 
 class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
+  bool couldMoveToNext = false;
   bool isAlarmTypeRepeatable = false;
   RepeatType repeatType = RepeatType.none;
   DateTime alarmStartsAt = DateTime.now();
@@ -28,11 +30,27 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
   final now = DateTime.now();
 
   @override
+  void initState() {
+    super.initState();
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+      _alarmController.addListener(() {
+        if (mounted) {
+          setState(() {
+            couldMoveToNext = !isFormEmpty();
+          });
+        }
+      });
+    });
+  }
+
+  @override
   void dispose() {
     _alarmController.dispose();
     _categoryController.dispose();
     super.dispose();
   }
+
+  isFormEmpty() => (_categoryController.text.isEmpty || (!isAlarmTypeRepeatable && _alarmController.getAlarmList().isEmpty));
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +80,11 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
                     controller: _categoryController,
                     style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor),
                     decoration: const InputDecoration(labelText: '', hintText: '카테고리 입력!', prefixIcon: Icon(Icons.arrow_forward), contentPadding: EdgeInsets.zero),
+                    onChanged: (val) {
+                      setState(() {
+                        couldMoveToNext = !isFormEmpty();
+                      });
+                    },
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -79,6 +102,7 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
                             if (!isAlarmTypeRepeatable) {
                               isAlarmTypeRepeatable = true;
                               repeatType = RepeatType.daily;
+                              couldMoveToNext = !isFormEmpty();
                             }
                           });
                         },
@@ -107,6 +131,7 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
                             if (isAlarmTypeRepeatable) {
                               isAlarmTypeRepeatable = false;
                               repeatType = RepeatType.none;
+                              couldMoveToNext = !isFormEmpty();
                             }
                           });
                         },
@@ -132,19 +157,28 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
                 ),
                 const SizedBox(height: 10),
                 const Divider(thickness: 2),
-                const Align(
+                Align(
                   alignment: AlignmentDirectional.centerStart,
-                  child: Text('알람 주기를 선택해주세요.'),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('알람 주기를 선택해주세요.'),
+                      if (repeatType == RepeatType.none) const Text('일회성 알람은 여러 날짜를 선택할 수 있습니다.'),
+                    ],
+                  ),
                 ),
                 SfDateRangePicker(
                   selectionMode: (isAlarmTypeRepeatable) ? DateRangePickerSelectionMode.single : DateRangePickerSelectionMode.multiple,
                   enablePastDates: false,
                   showNavigationArrow: true,
+                  initialSelectedDate: DateTime.now(),
                   onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
                     if (isAlarmTypeRepeatable) {
                       DateTime selected = args.value as DateTime;
                       setState(() {
                         alarmStartsAt = selected;
+                        couldMoveToNext = !isFormEmpty();
                       });
                     } else {
                       List<DateTime> selected = args.value as List<DateTime>;
@@ -202,48 +236,48 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          isFormEmpty() => (_categoryController.text.isEmpty || (!isAlarmTypeRepeatable && _alarmController.getAlarmList().isEmpty));
+      floatingActionButton: (couldMoveToNext)
+          ? FloatingActionButton(
+              onPressed: () async {
+                if (!couldMoveToNext) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('카테고리와 알람을 모두 입력해주세요.')));
+                  return;
+                }
 
-          if (isFormEmpty()) {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('카테고리와 알람을 모두 입력해주세요.')));
-            return;
-          }
+                final data = ref.read(AddNoteScreen.addNoteDataProvider);
 
-          final data = ref.read(AddNoteScreen.addNoteDataProvider);
+                data['category'] = _categoryController.text;
+                data['scheduleDates'] = (isAlarmTypeRepeatable) ? [alarmStartsAt] : _alarmController.getAlarmList();
+                data['repeatType'] = repeatType;
+                data['pubDate'] = now;
 
-          data['category'] = _categoryController.text;
-          data['scheduleDates'] = (isAlarmTypeRepeatable) ? [alarmStartsAt] : _alarmController.getAlarmList();
-          data['repeatType'] = repeatType;
-          data['pubDate'] = now;
+                final Time? alarmTime = await showSettings(context);
+                if (alarmTime == null) return;
 
-          final Time? alarmTime = await showSettings(context);
-          if (alarmTime == null) return;
+                List<DateTime> scheduleDates = data["scheduleDates"];
+                List<DateTime> alarmTimeAppliedDates = [];
+                for (DateTime date in scheduleDates) {
+                  alarmTimeAppliedDates.add(DateTime(date.year, date.month, date.day, alarmTime.hour, alarmTime.minute));
+                }
+                data["scheduleDates"] = alarmTimeAppliedDates;
 
-          List<DateTime> scheduleDates = data["scheduleDates"];
-          List<DateTime> alarmTimeAppliedDates = [];
-          for (DateTime date in scheduleDates) {
-            alarmTimeAppliedDates.add(DateTime(date.year, date.month, date.day, alarmTime.hour, alarmTime.minute));
-          }
-          data["scheduleDates"] = alarmTimeAppliedDates;
-
-          if (mounted) {
-            Navigator.pop(
-              context,
-              Note(
-                title: data['title'],
-                category: data['category'],
-                keywords: data['keywords'],
-                scheduledDates: data['scheduleDates'],
-                repeatType: data['repeatType'],
-                pubDate: data['pubDate'],
-              ),
-            );
-          }
-        },
-        child: const Icon(Icons.send),
-      ),
+                if (mounted) {
+                  Navigator.pop(
+                    context,
+                    Note(
+                      title: data['title'],
+                      category: data['category'],
+                      keywords: data['keywords'],
+                      scheduledDates: data['scheduleDates'],
+                      repeatType: data['repeatType'],
+                      pubDate: data['pubDate'],
+                    ),
+                  );
+                }
+              },
+              child: const Icon(Icons.send),
+            )
+          : null,
     );
   }
 

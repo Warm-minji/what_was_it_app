@@ -7,7 +7,6 @@ import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:notification_permissions/notification_permissions.dart';
-import 'package:what_was_it_app/core/notification_plugin.dart';
 import 'package:what_was_it_app/core/provider.dart';
 import 'package:what_was_it_app/model/note.dart';
 import 'package:what_was_it_app/view/home/add_note_screen.dart';
@@ -25,52 +24,18 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+  bool _notificationPerm = false;
 
   @override
   void initState() {
     super.initState();
     NotificationPermissions.getNotificationPermissionStatus().then((perm) {
-      if (perm == PermissionStatus.denied || perm == PermissionStatus.unknown) {
-        // print(perm);
-        SchedulerBinding.instance.addPostFrameCallback((_) async {
+      if (!(perm == PermissionStatus.denied || perm == PermissionStatus.unknown)) {
+        SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
           if (mounted) {
-            if (Platform.isIOS) {
-              await showCupertinoDialog(
-                barrierDismissible: false,
-                context: context,
-                builder: (context) => CupertinoAlertDialog(
-                  title: const Text('권한 요청'),
-                  content: const Text('원활한 사용을 위해\n알림 권한히 필요합니다.'),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text('알겠습니다'),
-                    ),
-                  ],
-                ),
-              );
-            } else {
-              await showDialog(
-                barrierDismissible: false,
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('권한 요청'),
-                  content: const Text('앱을 사용하기 위해\n알림 권한히 필요합니다.'),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text('네'),
-                    ),
-                  ],
-                ),
-              );
-            }
-            await NotificationPermissions.requestNotificationPermissions();
-            if (mounted) Phoenix.rebirth(context);
+            setState(() {
+              _notificationPerm = true;
+            });
           }
         });
       }
@@ -91,13 +56,70 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         actions: [
           InkWell(
             onTap: () async {
-              showModalBottomSheet(
-                  context: context,
-                  builder: (context) {
-                    return UpcomingAlarmListView();
-                  });
+              if (_notificationPerm) {
+                showModalBottomSheet(
+                    context: context,
+                    builder: (context) {
+                      return UpcomingAlarmListView();
+                    });
+              } else {
+                if (mounted) {
+                  if (Platform.isIOS) {
+                    await showCupertinoDialog(
+                      context: context,
+                      builder: (context) => CupertinoAlertDialog(
+                        title: const Text('권한 요청'),
+                        content: const Text('알림 기능 사용을 위해\n알림 권한히 필요합니다.'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text('취소'),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              Navigator.pop(context);
+                              await NotificationPermissions.requestNotificationPermissions();
+                              if (mounted) Phoenix.rebirth(context);
+                            },
+                            child: const Text('권한 설정하기'),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    await showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('권한 요청'),
+                        content: const Text('알림 기능 사용을 위해\n알림 권한히 필요합니다.'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text('취소'),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              Navigator.pop(context);
+                              await NotificationPermissions.requestNotificationPermissions();
+                              if (mounted) Phoenix.rebirth(context);
+                            },
+                            child: const Text('권한 설정하기'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                }
+              }
             },
-            child: ConstrainedBox(constraints: const BoxConstraints(minWidth: kToolbarHeight, minHeight: kToolbarHeight), child: const Icon(FontAwesomeIcons.bell)),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minWidth: kToolbarHeight, minHeight: kToolbarHeight),
+              child: (_notificationPerm) ? const Icon(FontAwesomeIcons.bell) : const Icon(FontAwesomeIcons.bellSlash),
+            ),
           ),
         ],
         bottom: PreferredSize(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:notification_permissions/notification_permissions.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:what_was_it_app/core/theme.dart';
 import 'package:what_was_it_app/model/note.dart';
@@ -357,6 +358,20 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
                       Text("${alarmTime.hour}시 ${alarmTime.minute.toString().padLeft(2, "0")}분에 알림이 전송됩니다."),
                       Text(msg, style: TextStyle(color: Theme.of(context).primaryColor)),
                       const SizedBox(height: 20),
+                      FutureBuilder(
+                        future: NotificationPermissions.getNotificationPermissionStatus(),
+                        builder: (context, snapshot) {
+                          final perm = snapshot.data;
+                          if (perm == PermissionStatus.denied || perm == PermissionStatus.unknown) {
+                            return const Text(
+                              "현재 알림 기능이 비활성화 상태입니다.\n알림 기능을 이용하려면 홈화면 우측 상단을 클릭하여 설정 후 노트를 추가해주세요.\n\n추가 후에는 알림을 설정할 수 없습니다.",
+                              style: TextStyle(color: Colors.red),
+                            );
+                          } else {
+                            return Container();
+                          }
+                        },
+                      ),
                       Align(
                         alignment: AlignmentDirectional.centerEnd,
                         child: InkWell(

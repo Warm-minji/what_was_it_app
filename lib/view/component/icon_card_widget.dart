@@ -38,9 +38,12 @@ class IconCardWidget extends StatelessWidget {
                         ),
                       ),
                       if (subtitle != null)
-                        Text(
-                          subtitle!,
-                          style: TextStyle(fontSize: 18, color: textColor),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            subtitle!,
+                            style: TextStyle(fontSize: 18, color: textColor),
+                          ),
                         ),
                     ],
                   ),

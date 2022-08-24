@@ -52,12 +52,12 @@ String getDescOfPeriodicAlarm(Note note) {
     case RepeatType.none:
       return "";
     case RepeatType.daily:
-      return "${formatDate(note.scheduledDates[0])}부터\n매일 반복";
+      return "${formatDate(note.scheduledDates[0])}부터\n매일 반복\n[${note.scheduledDates.first.hour}시 ${note.scheduledDates.first.minute.toString().padLeft(2, "0")}분]";
     case RepeatType.weekly:
-      return "${formatDate(note.scheduledDates[0])}부터\n매주 ${weekDayToString(note.scheduledDates[0].weekday)}요일마다 반복";
+      return "${formatDate(note.scheduledDates[0])}부터\n매주 ${weekDayToString(note.scheduledDates[0].weekday)}요일마다 반복\n[${note.scheduledDates.first.hour}시 ${note.scheduledDates.first.minute.toString().padLeft(2, "0")}분]";
     case RepeatType.monthly:
-      return "${formatDate(note.scheduledDates[0])}부터\n매달 ${note.scheduledDates[0].day}일마다 반복";
+      return "${formatDate(note.scheduledDates[0])}부터\n매달 ${note.scheduledDates[0].day}일마다 반복\n[${note.scheduledDates.first.hour}시 ${note.scheduledDates.first.minute.toString().padLeft(2, "0")}분]";
     case RepeatType.yearly:
-      return "${formatDate(note.scheduledDates[0])}부터\n매년 ${note.scheduledDates[0].month}월 ${note.scheduledDates[0].day}일마다 반복";
+      return "${formatDate(note.scheduledDates[0])}부터\n매년 ${note.scheduledDates[0].month}월 ${note.scheduledDates[0].day}일마다 반복\n[${note.scheduledDates.first.hour}시 ${note.scheduledDates.first.minute.toString().padLeft(2, "0")}분]";
   }
 }

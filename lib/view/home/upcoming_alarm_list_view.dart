@@ -145,21 +145,51 @@ class _UpcomingAlarmListViewState extends ConsumerState<UpcomingAlarmListView> {
 
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: ListTile(
-                        title: Text(
-                          alarmNote.note.title,
-                          style: kLargeTextStyle.copyWith(
-                            fontWeight: FontWeight.normal,
-                            color: Theme.of(context).primaryColor,
-                          ),
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Theme.of(context).primaryColor),
                         ),
-                        subtitle: Text('카테고리 : ${alarmNote.note.category}'),
-                        shape: Border.all(color: Theme.of(context).primaryColor),
-                        trailing: Text(
-                          (repeatSelected) ? getDescOfPeriodicAlarm(alarmNote.note) : dateString,
-                          textAlign: TextAlign.right,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    alarmNote.note.title,
+                                    style: kLargeTextStyle.copyWith(
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                  ),
+                                  Text('카테고리 : ${alarmNote.note.category}'),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 20),
+                            Text(
+                              (repeatSelected) ? getDescOfPeriodicAlarm(alarmNote.note) : dateString,
+                              textAlign: TextAlign.right,
+                            ),
+                          ],
                         ),
                       ),
+                      // child: ListTile(
+                      //   title: Text(
+                      //     alarmNote.note.title,
+                      //     style: kLargeTextStyle.copyWith(
+                      //       fontWeight: FontWeight.normal,
+                      //       color: Theme.of(context).primaryColor,
+                      //     ),
+                      //   ),
+                      //   subtitle: Text('카테고리 : ${alarmNote.note.category}'),
+                      //   shape: Border.all(color: Theme.of(context).primaryColor),
+                      //   trailing: Text(
+                      //     (repeatSelected) ? getDescOfPeriodicAlarm(alarmNote.note) : dateString,
+                      //     textAlign: TextAlign.right,
+                      //   ),
+                      // ),
                     );
                   },
                 );

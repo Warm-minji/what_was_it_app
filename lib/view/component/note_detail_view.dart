@@ -85,7 +85,7 @@ class NoteDetailView extends StatelessWidget {
           child: Align(
             alignment: AlignmentDirectional.centerStart,
             child: Text(
-              '알람 종류 : ${(note.repeatType != RepeatType.none) ? '반복성 알람' : '일회성 알람'}',
+              '알람 종류 : ${(note.repeatType != RepeatType.none) ? '반복성 알람' : '일회성 알람'} [${note.scheduledDates.first.hour}시 ${note.scheduledDates.first.minute.toString().padLeft(2, "0")}분]',
               style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor),
               overflow: TextOverflow.ellipsis,
             ),

@@ -2,10 +2,11 @@ import 'package:clickable_list_wheel_view/clickable_list_wheel_widget.dart';
 import 'package:flutter/material.dart';
 
 class ScrollListView extends StatefulWidget {
-  const ScrollListView({Key? key, required this.controller, required this.item}) : super(key: key);
+  const ScrollListView({Key? key, this.controller, required this.item, this.onChanged}) : super(key: key);
 
-  final ScrollListViewController controller;
+  final ScrollListViewController? controller;
   final List<String> item;
+  final Function? onChanged;
 
   @override
   State<ScrollListView> createState() => _ScrollListViewState();
@@ -17,12 +18,12 @@ class _ScrollListViewState extends State<ScrollListView> {
   @override
   void initState() {
     super.initState();
-    widget.controller.setCurrentIndex(0);
+    widget.controller?.setCurrentIndex(0);
   }
 
   @override
   Widget build(BuildContext context) {
-    const itemHeight = 42.0;
+    const itemHeight = 48.0;
     final itemCount = widget.item.length;
 
     return ClickableListWheelScrollView(
@@ -36,7 +37,10 @@ class _ScrollListViewState extends State<ScrollListView> {
         overAndUnderCenterOpacity: 0.6,
         diameterRatio: 1.8,
         perspective: 0.01,
-        onSelectedItemChanged: (idx) => widget.controller.setCurrentIndex(idx),
+        onSelectedItemChanged: (idx) {
+          widget.controller?.setCurrentIndex(idx);
+          if (widget.onChanged != null) widget.onChanged!(idx);
+        },
         childDelegate: ListWheelChildBuilderDelegate(
           childCount: itemCount,
           builder: (context, idx) {
@@ -74,6 +78,7 @@ class ScrollListViewController extends ChangeNotifier {
   ScrollListViewController();
 
   int getCurrentIndex() => _currentIdx;
+
   void setCurrentIndex(int idx) {
     _currentIdx = idx;
     notifyListeners();

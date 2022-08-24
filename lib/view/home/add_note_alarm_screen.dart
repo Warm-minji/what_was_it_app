@@ -9,6 +9,7 @@ import 'package:what_was_it_app/core/theme.dart';
 import 'package:what_was_it_app/model/note.dart';
 import 'package:what_was_it_app/view/component/alarm_list_view.dart';
 import 'package:what_was_it_app/view/component/no_title_frame_view.dart';
+import 'package:what_was_it_app/view/component/scroll_list_view.dart';
 import 'package:what_was_it_app/view/home/add_note_screen.dart';
 
 class AddNoteAlarmScreen extends ConsumerStatefulWidget {
@@ -282,15 +283,7 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
   }
 
   showSettings(context) async {
-    Time alarmTime = const Time(9, 0);
-
-    final TextEditingController hourController = TextEditingController();
-    final TextEditingController minController = TextEditingController();
-
-    hourController.text = "${alarmTime.hour}";
-    minController.text = "${alarmTime.minute}".padLeft(2, "0");
-
-    String msg = "";
+    Time alarmTime = const Time(0, 0);
 
     return await showDialog(
       context: context,
@@ -313,84 +306,37 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
                           Text("알림 시각 설정하기", style: kLargeTextStyle),
                         ],
                       ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: hourController,
-                              textAlign: TextAlign.center,
-                              onChanged: (val) {
-                                val = val.trim();
-                                if (val.isNotEmpty) {
-                                  if (val.length > 2) {
-                                    msg = "두 숫자만 입력할 수 있습니다.";
-                                    hourController.text = alarmTime.hour.toString();
-                                    FocusScope.of(context).unfocus();
-                                    return;
-                                  }
-                                  int? newHour = int.tryParse(val);
-                                  if (newHour == null || (newHour < 0 || newHour >= 24)) {
-                                    setState(() {
-                                      msg = "시간은 0~23까지의 숫자만 입력할 수 있습니다.";
-                                      hourController.text = alarmTime.hour.toString();
-                                    });
-                                    FocusScope.of(context).unfocus();
-                                    return;
-                                  }
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        height: 200,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: ScrollListView(
+                                item: [for (int i = 0; i < 24; i++) "${i.toString()}시"],
+                                onChanged: (val) {
                                   setState(() {
-                                    msg = "";
-                                    alarmTime = Time(newHour, alarmTime.minute);
+                                    alarmTime = Time(val, alarmTime.minute);
                                   });
-                                } else {
-                                  setState(() {
-                                    msg = "";
-                                    alarmTime = Time(0, alarmTime.minute);
-                                  });
-                                }
-                              },
+                                },
+                              ),
                             ),
-                          ),
-                          const Text(":", style: kLargeTextStyle),
-                          Expanded(
-                            child: TextField(
-                              controller: minController,
-                              textAlign: TextAlign.center,
-                              onChanged: (val) {
-                                val = val.trim();
-                                if (val.isNotEmpty) {
-                                  if (val.length > 2) {
-                                    msg = "두 숫자만 입력할 수 있습니다.";
-                                    minController.text = alarmTime.minute.toString().padLeft(2, "0");
-                                    FocusScope.of(context).unfocus();
-                                    return;
-                                  }
-                                  int? newMinute = int.tryParse(val);
-                                  if (newMinute == null || (newMinute < 0 || newMinute >= 60)) {
-                                    setState(() {
-                                      msg = "분은 0~59까지의 숫자만 입력할 수 있습니다.";
-                                      minController.text = alarmTime.minute.toString().padLeft(2, "0");
-                                    });
-                                    FocusScope.of(context).unfocus();
-                                    return;
-                                  }
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: ScrollListView(
+                                item: [for (int i = 0; i < 60; i++) "${i.toString().padLeft(2, "0")}분"],
+                                onChanged: (val) {
                                   setState(() {
-                                    msg = "";
-                                    alarmTime = Time(alarmTime.hour, newMinute);
+                                    alarmTime = Time(alarmTime.hour, val);
                                   });
-                                } else {
-                                  setState(() {
-                                    msg = "";
-                                    alarmTime = Time(alarmTime.hour, 0);
-                                  });
-                                }
-                              },
-                            ),
-                          ),
-                        ],
+                                },
+                              ),
+                            )
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 10),
                       Text("${alarmTime.hour}시 ${alarmTime.minute.toString().padLeft(2, "0")}분에 알림이 전송됩니다."),
-                      Text(msg, style: TextStyle(color: Theme.of(context).primaryColor)),
                       const SizedBox(height: 20),
                       FutureBuilder(
                         future: NotificationPermissions.getNotificationPermissionStatus(),

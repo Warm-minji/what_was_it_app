@@ -13,13 +13,15 @@ import 'package:timezone/timezone.dart' as tz;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  prefs = await SharedPreferences.getInstance();
-  // TODO onboarding check
-
+  await _loadSharedPreferences();
   // await prefs.clear(); // clear all
   await _initializeNotification();
 
   runApp(Phoenix(child: const MyApp()));
+}
+
+Future _loadSharedPreferences() async {
+  prefs = await SharedPreferences.getInstance();
 }
 
 Future _initializeNotification() async {

@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:notification_permissions/notification_permissions.dart';
@@ -22,28 +21,96 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   bool _notificationPerm = false;
 
   @override
   void initState() {
     super.initState();
-    NotificationPermissions.getNotificationPermissionStatus().then((perm) {
-      if (!(perm == PermissionStatus.denied || perm == PermissionStatus.unknown)) {
-        SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-          if (mounted) {
-            setState(() {
-              _notificationPerm = true;
-            });
-          }
-        });
-      }
-    });
+    WidgetsBinding.instance.addObserver(this);
+    _refreshPermission();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      _refreshPermission();
+    }
+  }
+
+  Future _refreshPermission() async {
+    final perm = await NotificationPermissions.getNotificationPermissionStatus();
+    if (mounted) {
+      setState(() {
+        _notificationPerm = _checkNotificationPermission(perm);
+      });
+    }
+  }
+
+  bool _checkNotificationPermission(PermissionStatus perm) => !(perm == PermissionStatus.denied || perm == PermissionStatus.unknown);
+
+  _showCupertinoStylePermRequest() async {
+    await showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text('권한 요청'),
+        content: const Text('알림 기능 사용을 위해\n알림 권한히 필요합니다.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('취소'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await NotificationPermissions.requestNotificationPermissions();
+            },
+            child: const Text('권한 설정하기'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  _showAndroidStylePermRequest() async {
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('권한 요청'),
+        content: const Text('알림 기능 사용을 위해\n알림 권한히 필요합니다.'),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await NotificationPermissions.requestNotificationPermissions();
+            },
+            child: const Text('권한 설정하기'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('취소'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    const appBarLeadingIconConstraints = BoxConstraints(minWidth: kToolbarHeight, minHeight: kToolbarHeight);
+
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -56,68 +123,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         actions: [
           InkWell(
             onTap: () async {
+              await _refreshPermission();
               if (_notificationPerm) {
                 showModalBottomSheet(
                     context: context,
                     builder: (context) {
-                      return UpcomingAlarmListView();
+                      return const UpcomingAlarmListView();
                     });
               } else {
-                if (mounted) {
-                  if (Platform.isIOS) {
-                    await showCupertinoDialog(
-                      context: context,
-                      builder: (context) => CupertinoAlertDialog(
-                        title: const Text('권한 요청'),
-                        content: const Text('알림 기능 사용을 위해\n알림 권한히 필요합니다.'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: const Text('취소'),
-                          ),
-                          TextButton(
-                            onPressed: () async {
-                              Navigator.pop(context);
-                              await NotificationPermissions.requestNotificationPermissions();
-                              if (mounted) Phoenix.rebirth(context);
-                            },
-                            child: const Text('권한 설정하기'),
-                          ),
-                        ],
-                      ),
-                    );
-                  } else {
-                    await showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('권한 요청'),
-                        content: const Text('알림 기능 사용을 위해\n알림 권한히 필요합니다.'),
-                        actions: [
-                          TextButton(
-                            onPressed: () async {
-                              Navigator.pop(context);
-                              await NotificationPermissions.requestNotificationPermissions();
-                              if (mounted) Phoenix.rebirth(context);
-                            },
-                            child: const Text('권한 설정하기'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: const Text('취소'),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
+                if (Platform.isIOS) {
+                  await _showCupertinoStylePermRequest();
+                } else {
+                  await _showAndroidStylePermRequest();
                 }
               }
             },
             child: ConstrainedBox(
-              constraints: const BoxConstraints(minWidth: kToolbarHeight, minHeight: kToolbarHeight),
+              constraints: appBarLeadingIconConstraints,
               child: (_notificationPerm) ? const Icon(FontAwesomeIcons.bell) : const Icon(FontAwesomeIcons.bellSlash),
             ),
           ),

@@ -24,10 +24,10 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
   @override
   void initState() {
     super.initState();
-    _checkServer();
+    _checkServerLive();
   }
 
-  Future _checkServer() async {
+  Future _checkServerLive() async {
     final check = await ref.read(noteRepoProvider.notifier).checkServerConnection();
     if (mounted) {
       setState(() {
@@ -38,6 +38,8 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
 
   @override
   Widget build(BuildContext context) {
+    const cancelLineTextStyle = TextStyle(decoration: TextDecoration.lineThrough);
+
     return Drawer(
       width: MediaQuery.of(context).size.width * 0.8,
       child: SafeArea(
@@ -82,7 +84,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                       onTap: () {
                         // TODO
                       },
-                      child: const Text("통계 보기", style: TextStyle(decoration: TextDecoration.lineThrough)),
+                      child: const Text("통계 보기", style: cancelLineTextStyle),
                     ),
                     const Divider(thickness: 1, height: 0),
                     MainDrawerItem(
@@ -93,7 +95,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                       },
                       child: Text(
                         "기억 백업하기",
-                        style: (isServerLive) ? null : const TextStyle(decoration: TextDecoration.lineThrough),
+                        style: (isServerLive) ? null : cancelLineTextStyle,
                       ),
                     ),
                     const Divider(thickness: 1, height: 0),
@@ -105,7 +107,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                       },
                       child: Text(
                         "기억 복구하기",
-                        style: (isServerLive) ? null : const TextStyle(decoration: TextDecoration.lineThrough),
+                        style: (isServerLive) ? null : cancelLineTextStyle,
                       ),
                     ),
                     const Divider(thickness: 1, height: 0),

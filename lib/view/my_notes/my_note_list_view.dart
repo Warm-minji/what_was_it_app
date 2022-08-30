@@ -16,17 +16,21 @@ class MyNoteListView extends ConsumerWidget {
 
     return NoTitleFrameView(
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                '내 기억 노트 목록',
-                style: TextStyle(fontSize: 22, color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold, decoration: TextDecoration.none, fontFamily: 'GowunDodum'),
-              ),
-              const SizedBox(width: 10),
-              Icon(FontAwesomeIcons.listOl, color: Theme.of(context).primaryColor),
-            ],
+          Container(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '내 기억 노트 목록',
+                  style: TextStyle(fontSize: 22, color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold, decoration: TextDecoration.none, fontFamily: 'GowunDodum'),
+                ),
+                const SizedBox(width: 10),
+                Icon(FontAwesomeIcons.listOl, color: Theme.of(context).primaryColor),
+              ],
+            ),
           ),
           const SizedBox(height: 20),
           Expanded(

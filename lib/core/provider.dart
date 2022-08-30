@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:what_was_it_app/core/shared_preferences.dart';
 import 'package:what_was_it_app/model/note.dart';
-import 'package:what_was_it_app/repo/NoteRepo.dart';
+import 'package:what_was_it_app/repo/note_repo.dart';
 
 final noteRepoProvider = StateNotifierProvider<NoteRepo, List<Note>>((ref) {
   List<Note> result = [];

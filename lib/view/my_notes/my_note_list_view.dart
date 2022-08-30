@@ -34,67 +34,81 @@ class MyNoteListView extends ConsumerWidget {
           ),
           const SizedBox(height: 20),
           Expanded(
-            child: ListView.builder(
-              itemCount: noteList.length,
-              itemBuilder: (context, idx) {
-                Note note = noteList[idx];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => NoTitleFrameView(
-                            body: NoteDetailView(note: note),
-                            floatingActionButton: FloatingActionButton(
-                              child: const Icon(FontAwesomeIcons.trash),
-                              onPressed: () async {
-                                await showDialog(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    title: const Text('잠시만요'),
-                                    content: const Text('정말 삭제하시겠어요?\n되돌릴 수 없습니다!'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          ref.read(noteRepoProvider.notifier).removeNote(idx);
-                                          Navigator.pop(context);
-                                          Navigator.pop(context);
-                                        },
-                                        child: const Text('네', style: TextStyle(color: Colors.red)),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: const Text('아니요'),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
+              child: ListView.builder(
+            itemCount: noteList.length,
+            itemBuilder: (context, idx) {
+              Note note = noteList[idx];
+
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NoTitleFrameView(
+                          body: NoteDetailView(note: note),
+                          floatingActionButton: FloatingActionButton(
+                            child: const Icon(FontAwesomeIcons.trash),
+                            onPressed: () async {
+                              await showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text('잠시만요'),
+                                  content: const Text('정말 삭제하시겠어요?\n되돌릴 수 없습니다!'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        ref.read(noteRepoProvider.notifier).removeNote(idx);
+                                        Navigator.pop(context);
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('네', style: TextStyle(color: Colors.red)),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('아니요'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
                           ),
                         ),
-                      );
-                    },
-                    child: ListTile(
-                      title: Text(
-                        note.title,
-                        style: kLargeTextStyle.copyWith(
-                          fontWeight: FontWeight.normal,
-                          color: Theme.of(context).primaryColor,
-                        ),
                       ),
-                      subtitle: Text('카테고리 : ${note.category}'),
-                      shape: Border.all(color: Theme.of(context).primaryColor),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Theme.of(context).primaryColor),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                note.title,
+                                style: kLargeTextStyle.copyWith(
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                              ),
+                              Text('카테고리 : ${note.category}'),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                );
-              },
-            ),
-          ),
+                ),
+              );
+            },
+          )),
         ],
       ),
     );

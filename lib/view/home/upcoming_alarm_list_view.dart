@@ -23,9 +23,14 @@ class _UpcomingAlarmListViewState extends ConsumerState<UpcomingAlarmListView> {
 
   bool repeatSelected = false;
 
-  @override
-  void initState() {
-    super.initState();
+  _changeSelection({required bool repeatNoteSelected}) {
+    repeatSelected = repeatNoteSelected;
+    if (repeatSelected) {
+      selectedNotes = repeatNotes;
+    } else {
+      selectedNotes = noRepeatNotes;
+    }
+    setState(() {});
   }
 
   @override
@@ -42,8 +47,8 @@ class _UpcomingAlarmListViewState extends ConsumerState<UpcomingAlarmListView> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text("예정된 기억 알림 목록", style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal)),
-                    SizedBox(width: 10),
-                    Icon(FontAwesomeIcons.listUl),
+                    const SizedBox(width: 10),
+                    const Icon(FontAwesomeIcons.listUl),
                   ],
                 ),
                 const SizedBox(height: 10),
@@ -52,10 +57,7 @@ class _UpcomingAlarmListViewState extends ConsumerState<UpcomingAlarmListView> {
                     Expanded(
                       child: InkWell(
                         onTap: () {
-                          setState(() {
-                            repeatSelected = true;
-                            selectedNotes = repeatNotes;
-                          });
+                          _changeSelection(repeatNoteSelected: true);
                         },
                         child: Container(
                           color: (repeatSelected) ? Theme.of(context).primaryColor : null,
@@ -77,10 +79,7 @@ class _UpcomingAlarmListViewState extends ConsumerState<UpcomingAlarmListView> {
                     Expanded(
                       child: InkWell(
                         onTap: () {
-                          setState(() {
-                            repeatSelected = false;
-                            selectedNotes = noRepeatNotes;
-                          });
+                          _changeSelection(repeatNoteSelected: false);
                         },
                         child: Container(
                           color: (!repeatSelected) ? Theme.of(context).primaryColor : null,
@@ -112,19 +111,11 @@ class _UpcomingAlarmListViewState extends ConsumerState<UpcomingAlarmListView> {
             child: FutureBuilder(
               future: flutterLocalNotificationsPlugin.pendingNotificationRequests(),
               builder: (BuildContext context, AsyncSnapshot<List<PendingNotificationRequest>> snapshot) {
-                List<Note> noteList = ref.read(noteRepoProvider);
-                List<AlarmNote> upcomingAlarmList = [];
                 if (snapshot.data?.isEmpty ?? true) return Container();
 
-                for (var item in snapshot.data!) {
-                  for (var note in noteList) {
-                    if (note.notificationId?.contains(item.id) ?? false) {
-                      final scheduledDate = note.scheduledDates[note.notificationId!.indexOf(item.id)];
-                      if (note.repeatType != RepeatType.none || scheduledDate.isAfter(DateTime.now())) upcomingAlarmList.add(AlarmNote(note: note, scheduledDate: scheduledDate));
-                      break;
-                    }
-                  }
-                }
+                List<Note> noteList = ref.watch(noteRepoProvider);
+
+                final upcomingAlarmList = _getUpcomingAlarmList(snapshot.data!, noteList);
 
                 noRepeatNotes = upcomingAlarmList.where((note) => note.note.repeatType == RepeatType.none).toList();
                 repeatNotes = upcomingAlarmList.where((note) => note.note.repeatType != RepeatType.none).toList();
@@ -175,21 +166,6 @@ class _UpcomingAlarmListViewState extends ConsumerState<UpcomingAlarmListView> {
                           ],
                         ),
                       ),
-                      // child: ListTile(
-                      //   title: Text(
-                      //     alarmNote.note.title,
-                      //     style: kLargeTextStyle.copyWith(
-                      //       fontWeight: FontWeight.normal,
-                      //       color: Theme.of(context).primaryColor,
-                      //     ),
-                      //   ),
-                      //   subtitle: Text('카테고리 : ${alarmNote.note.category}'),
-                      //   shape: Border.all(color: Theme.of(context).primaryColor),
-                      //   trailing: Text(
-                      //     (repeatSelected) ? getDescOfPeriodicAlarm(alarmNote.note) : dateString,
-                      //     textAlign: TextAlign.right,
-                      //   ),
-                      // ),
                     );
                   },
                 );
@@ -199,5 +175,26 @@ class _UpcomingAlarmListViewState extends ConsumerState<UpcomingAlarmListView> {
         ),
       ],
     );
+  }
+
+  List<AlarmNote> _getUpcomingAlarmList(List<PendingNotificationRequest> pendingNotificationRequests, List<Note> noteList) {
+    List<AlarmNote> result = [];
+
+    for (var e in pendingNotificationRequests) {
+      final note = noteList.where((note) => note.notificationId?.contains(e.id) ?? false).first;
+      final scheduledDate = note.scheduledDates[note.notificationId!.indexOf(e.id)];
+      if (note.repeatType != RepeatType.none || scheduledDate.isAfter(DateTime.now())) result.add(AlarmNote(note: note, scheduledDate: scheduledDate));
+    }
+    // for (var pendingNotificationRequest in pendingNotificationRequests) {
+    //   for (var note in noteList) {
+    //     if (note.notificationId?.contains(pendingNotificationRequest.id) ?? false) {
+    //       final scheduledDate = note.scheduledDates[note.notificationId!.indexOf(pendingNotificationRequest.id)];
+    //       if (note.repeatType != RepeatType.none || scheduledDate.isAfter(DateTime.now())) result.add(AlarmNote(note: note, scheduledDate: scheduledDate));
+    //       break;
+    //     }
+    //   }
+    // }
+
+    return result;
   }
 }

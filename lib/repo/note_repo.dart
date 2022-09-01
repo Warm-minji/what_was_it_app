@@ -11,7 +11,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:http/http.dart' as http;
 
 class NoteRepo extends StateNotifier<List<Note>> {
-  static const String host = "15.164.144.82:8080";
+  static const String host = "disconnect server"; // 15.164.144.82:8080
 
   NoteRepo(List<Note> list) : super(list);
 
@@ -48,13 +48,17 @@ class NoteRepo extends StateNotifier<List<Note>> {
     final req = http.Request("GET", url);
 
     bool check = false;
-    final res = await req.send().timeout(const Duration(seconds: 3), onTimeout: () {
-      check = false;
-      return http.StreamedResponse(Stream.value([]), 408);
-    });
+    try {
+      final res = await req.send().timeout(const Duration(seconds: 3), onTimeout: () {
+        check = false;
+        return http.StreamedResponse(Stream.value([]), 408);
+      });
 
-    // TODO 404로 체크하는 방법 말고 괜찮은 방법이 있을까..
-    if (res.statusCode == 404) check = true;
+      // TODO 404로 체크하는 방법 말고 괜찮은 방법이 있을까..
+      if (res.statusCode == 404) check = true;
+    } on Exception catch(e) {
+      return false;
+    }
 
     return check;
   }

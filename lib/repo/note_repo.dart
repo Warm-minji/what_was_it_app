@@ -200,26 +200,6 @@ class NoteRepo extends StateNotifier<List<Note>> {
     note.notifications ??= [];
     note.notifications!.add(Notification(notificationId: notificationId, notificationDate: scheduledDate));
 
-    DateTimeComponents? match;
-
-    switch (note.repeatType) {
-      case RepeatType.none:
-        match = null;
-        break;
-      case RepeatType.daily:
-        match = DateTimeComponents.time;
-        break;
-      case RepeatType.weekly:
-        match = DateTimeComponents.dayOfWeekAndTime;
-        break;
-      case RepeatType.monthly:
-        match = DateTimeComponents.dayOfMonthAndTime;
-        break;
-      case RepeatType.yearly:
-        match = DateTimeComponents.dateAndTime;
-        break;
-    }
-
     await flutterLocalNotificationsPlugin.zonedSchedule(
       notificationId,
       "[기억하다] ${note.title} 기억 나시나요?",
@@ -228,10 +208,34 @@ class NoteRepo extends StateNotifier<List<Note>> {
       _getNotificationDetails(),
       uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
       androidAllowWhileIdle: true,
-      matchDateTimeComponents: match,
+      matchDateTimeComponents: _getDateTimeComponentOfNote(note),
     );
 
     // print("$scheduledDate에 알람이 설정됐습니다."); // Test
+  }
+
+  DateTimeComponents? _getDateTimeComponentOfNote(Note note) {
+    DateTimeComponents? result;
+
+    switch (note.repeatType) {
+      case RepeatType.none:
+        result = null;
+        break;
+      case RepeatType.daily:
+        result = DateTimeComponents.time;
+        break;
+      case RepeatType.weekly:
+        result = DateTimeComponents.dayOfWeekAndTime;
+        break;
+      case RepeatType.monthly:
+        result = DateTimeComponents.dayOfMonthAndTime;
+        break;
+      case RepeatType.yearly:
+        result = DateTimeComponents.dateAndTime;
+        break;
+    }
+
+    return result;
   }
 
   NotificationDetails _getNotificationDetails() {

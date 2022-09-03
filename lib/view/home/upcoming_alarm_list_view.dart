@@ -184,7 +184,7 @@ class _UpcomingAlarmListViewState extends ConsumerState<UpcomingAlarmListView> {
       final notifications = note.notifications;
       if (notifications == null) continue;
 
-      for (final notification in notifications!) {
+      for (final notification in notifications) {
         if (pendingNotificationRequests.map((e) => e.id).contains(notification.notificationId)) {
           result.add(AlarmNote(note: note, scheduledDate: notification.notificationDate));
         }

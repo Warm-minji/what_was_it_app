@@ -165,7 +165,6 @@ class NoteRepo extends StateNotifier<List<Note>> {
     List<tz.TZDateTime> result = [];
 
     for (DateTime alarmDate in note.scheduledDates) {
-      // TODO 알람 시각 유저가 정하도록
       final scheduledDate = tz.TZDateTime(tz.local, alarmDate.year, alarmDate.month, alarmDate.day, alarmDate.hour, alarmDate.minute);
       result.add(scheduledDate);
     }
@@ -197,8 +196,7 @@ class NoteRepo extends StateNotifier<List<Note>> {
   }
 
   Future<void> _addNotification(tz.TZDateTime scheduledDate, Note note, int notificationId) async {
-    note.notifications ??= [];
-    note.notifications!.add(Notification(notificationId: notificationId, notificationDate: scheduledDate));
+    _addNotificationInfoToNote(note, Notification(notificationId: notificationId, notificationDate: scheduledDate));
 
     await flutterLocalNotificationsPlugin.zonedSchedule(
       notificationId,
@@ -212,6 +210,11 @@ class NoteRepo extends StateNotifier<List<Note>> {
     );
 
     // print("$scheduledDate에 알람이 설정됐습니다."); // Test
+  }
+
+  void _addNotificationInfoToNote(Note note, Notification notificationInfo) {
+    note.notifications ??= [];
+    note.notifications!.add(notificationInfo);
   }
 
   DateTimeComponents? _getDateTimeComponentOfNote(Note note) {

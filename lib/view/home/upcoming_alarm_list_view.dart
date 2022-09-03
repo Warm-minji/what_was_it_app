@@ -180,20 +180,16 @@ class _UpcomingAlarmListViewState extends ConsumerState<UpcomingAlarmListView> {
   List<AlarmNote> _getUpcomingAlarmList(List<PendingNotificationRequest> pendingNotificationRequests, List<Note> noteList) {
     List<AlarmNote> result = [];
 
-    for (var e in pendingNotificationRequests) {
-      final note = noteList.where((note) => note.notificationId?.contains(e.id) ?? false).first;
-      final scheduledDate = note.scheduledDates[note.notificationId!.indexOf(e.id)];
-      if (note.repeatType != RepeatType.none || scheduledDate.isAfter(DateTime.now())) result.add(AlarmNote(note: note, scheduledDate: scheduledDate));
+    for (final note in noteList) {
+      final notifications = note.notifications;
+      if (notifications == null) continue;
+
+      for (final notification in notifications!) {
+        if (pendingNotificationRequests.map((e) => e.id).contains(notification.notificationId)) {
+          result.add(AlarmNote(note: note, scheduledDate: notification.notificationDate));
+        }
+      }
     }
-    // for (var pendingNotificationRequest in pendingNotificationRequests) {
-    //   for (var note in noteList) {
-    //     if (note.notificationId?.contains(pendingNotificationRequest.id) ?? false) {
-    //       final scheduledDate = note.scheduledDates[note.notificationId!.indexOf(pendingNotificationRequest.id)];
-    //       if (note.repeatType != RepeatType.none || scheduledDate.isAfter(DateTime.now())) result.add(AlarmNote(note: note, scheduledDate: scheduledDate));
-    //       break;
-    //     }
-    //   }
-    // }
 
     return result;
   }

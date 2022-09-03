@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:what_was_it_app/model/notification.dart';
 
 part 'note.g.dart';
 
@@ -10,7 +11,7 @@ class Note {
   final List<DateTime> scheduledDates;
   final RepeatType repeatType; // no repeat iff this value is null
   final DateTime pubDate;
-  List<int>? notificationId;
+  List<Notification>? notifications;
 
   Note({
     required this.title,
@@ -19,7 +20,7 @@ class Note {
     required this.scheduledDates,
     required this.repeatType,
     required this.pubDate,
-    this.notificationId,
+    this.notifications,
   });
 
   factory Note.fromJson(Map<String, dynamic> json) => _$NoteFromJson(json);

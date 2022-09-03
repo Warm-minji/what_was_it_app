@@ -9,6 +9,7 @@ import 'package:what_was_it_app/model/note.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:http/http.dart' as http;
+import 'package:what_was_it_app/model/notification.dart';
 
 class NoteRepo extends StateNotifier<List<Note>> {
   static const String host = "disconnect server"; // 15.164.144.82:8080
@@ -164,15 +165,12 @@ class NoteRepo extends StateNotifier<List<Note>> {
   }
 
   Future _removeNotification(Note note) async {
-    if (note.notificationId != null && note.notificationId!.isNotEmpty) {
+    if (note.notifications != null && note.notifications!.isNotEmpty) {
       // TODO map 관련 확인
-      for (int notificationId in note.notificationId!) {
+      for (int notificationId in note.notifications!.map((e) => e.notificationId)) {
         await flutterLocalNotificationsPlugin.cancel(notificationId);
       }
-
-      // for (tz.TZDateTime scheduledDate in _getNoteAlarmDate(note)) {
-      // print("$scheduledDate에 알람이 삭제되었습니다."); // Test
-      // }
+      note.notifications = null;
     }
   }
 
@@ -189,7 +187,8 @@ class NoteRepo extends StateNotifier<List<Note>> {
   }
 
   Future<void> _addNotification(tz.TZDateTime scheduledDate, Note note, int notificationId) async {
-    note.notificationId = [...(note.notificationId ?? []), notificationId];
+    note.notifications ??= [];
+    note.notifications!.add(Notification(notificationId: notificationId, notificationDate: scheduledDate));
 
     DateTimeComponents? match;
 

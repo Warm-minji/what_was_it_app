@@ -18,20 +18,7 @@ class NoteRepo extends StateNotifier<List<Note>> {
 
   Future saveNote(Note note) async {
     state = [note, ...state];
-
-    int notificationId = _getNextNotificationId();
-
-    for (tz.TZDateTime scheduledDate in _getNoteAlarmDate(note)) {
-      // TODO map 동작 안하는데 왜 그런지 알아보기
-      if (note.repeatType != RepeatType.none || scheduledDate.isAfter(tz.TZDateTime.now(tz.local))) {
-        await _addNotification(scheduledDate, note, notificationId++);
-      } else {
-        note.scheduledDates.remove(scheduledDate);
-      }
-    }
-
-    await _setNextNotificationId(notificationId);
-
+    _registerNoteToNotificationSystem(note);
     prefs.setString('notes', jsonEncode(state));
   }
 
@@ -186,6 +173,29 @@ class NoteRepo extends StateNotifier<List<Note>> {
     return result;
   }
 
+  Future _registerNoteToNotificationSystem(Note note) async {
+    int notificationId = _getNextNotificationId();
+
+    for (tz.TZDateTime scheduledDate in _getNoteAlarmDate(note)) {
+      // TODO map 동작 안하는데 왜 그런지 알아보기
+      if (note.repeatType != RepeatType.none || scheduledDate.isAfter(tz.TZDateTime.now(tz.local))) {
+        await _addNotification(scheduledDate, note, notificationId++);
+      } else {
+        note.scheduledDates.remove(scheduledDate);
+      }
+    }
+
+    await _setNextNotificationId(notificationId);
+  }
+
+  int _getNextNotificationId() {
+    return prefs.getInt("notificationId") ?? 0;
+  }
+
+  Future<void> _setNextNotificationId(int id) async {
+    await prefs.setInt("notificationId", id);
+  }
+
   Future<void> _addNotification(tz.TZDateTime scheduledDate, Note note, int notificationId) async {
     note.notifications ??= [];
     note.notifications!.add(Notification(notificationId: notificationId, notificationDate: scheduledDate));
@@ -236,13 +246,5 @@ class NoteRepo extends StateNotifier<List<Note>> {
       android: androidNotificationDetails,
       iOS: iosNotificationDetails,
     );
-  }
-
-  int _getNextNotificationId() {
-    return prefs.getInt("notificationId") ?? 0;
-  }
-
-  Future<void> _setNextNotificationId(int id) async {
-    await prefs.setInt("notificationId", id);
   }
 }

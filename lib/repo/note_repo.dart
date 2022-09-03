@@ -18,17 +18,15 @@ class NoteRepo extends StateNotifier<List<Note>> {
 
   Future saveNote(Note note) async {
     state = [note, ...state];
-    _registerNoteToNotificationSystem(note);
-    prefs.setString('notes', jsonEncode(state));
+    await _registerNoteToNotificationSystem(note);
+    await _saveNotesInLocal(state);
   }
 
-  void removeNote(int index) {
-    _removeNotification(state.elementAt(index));
-
+  Future removeNote(int index) async {
+    await _removeNotification(state.elementAt(index));
     state.removeAt(index);
     state = [...state];
-
-    prefs.setString('notes', jsonEncode(state));
+    await _saveNotesInLocal(state);
   }
 
   Future<bool> checkServerConnection() async {
@@ -149,6 +147,10 @@ class NoteRepo extends StateNotifier<List<Note>> {
     if (res.statusCode != 200) {
       throw HttpException(jsonDecode(await res.stream.bytesToString())["errorMessage"]);
     }
+  }
+
+  Future _saveNotesInLocal(List<Note> notes) async {
+    await prefs.setString("notes", jsonEncode(notes));
   }
 
   Future _removeNotification(Note note) async {

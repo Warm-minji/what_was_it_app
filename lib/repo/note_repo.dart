@@ -180,8 +180,6 @@ class NoteRepo extends StateNotifier<List<Note>> {
       // TODO map 동작 안하는데 왜 그런지 알아보기
       if (note.repeatType != RepeatType.none || scheduledDate.isAfter(tz.TZDateTime.now(tz.local))) {
         await _addNotification(scheduledDate, note, notificationId++);
-      } else {
-        note.scheduledDates.remove(scheduledDate);
       }
     }
 

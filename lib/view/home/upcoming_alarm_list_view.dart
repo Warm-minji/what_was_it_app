@@ -8,6 +8,7 @@ import 'package:what_was_it_app/core/provider.dart';
 import 'package:what_was_it_app/core/theme.dart';
 import 'package:what_was_it_app/model/alarm_note.dart';
 import 'package:what_was_it_app/model/note.dart';
+import 'package:what_was_it_app/view/component/note_list_view.dart';
 
 class UpcomingAlarmListView extends ConsumerStatefulWidget {
   const UpcomingAlarmListView({Key? key}) : super(key: key);
@@ -122,53 +123,7 @@ class _UpcomingAlarmListViewState extends ConsumerState<UpcomingAlarmListView> {
                 selectedNotes = (repeatSelected) ? repeatNotes : noRepeatNotes;
                 selectedNotes.sort((a, b) => a.scheduledDate.compareTo(b.scheduledDate));
 
-                return ListView.builder(
-                  itemCount: selectedNotes.length,
-                  itemBuilder: (context, idx) {
-                    AlarmNote alarmNote = selectedNotes[idx];
-
-                    String dateString;
-                    if (alarmNote.scheduledDate.year == DateTime.now().year) {
-                      dateString = "${alarmNote.scheduledDate.month}월 ${alarmNote.scheduledDate.day}일 ${alarmNote.scheduledDate.hour}시 ${alarmNote.scheduledDate.minute.toString().padLeft(2, "0")}분";
-                    } else {
-                      dateString = "${formatDate(alarmNote.scheduledDate)} ${alarmNote.scheduledDate.hour}시 ${alarmNote.scheduledDate.minute.toString().padLeft(2, "0")}분";
-                    }
-
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Theme.of(context).primaryColor),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    alarmNote.note.title,
-                                    style: kLargeTextStyle.copyWith(
-                                      color: Theme.of(context).primaryColor,
-                                    ),
-                                  ),
-                                  Text('카테고리 : ${alarmNote.note.category}'),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 20),
-                            Text(
-                              (repeatSelected) ? getDescOfPeriodicAlarm(alarmNote.note) : dateString,
-                              textAlign: TextAlign.right,
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                );
+                return NoteListView(alarmNoteList: selectedNotes);
               },
             ),
           ),

@@ -5,9 +5,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:what_was_it_app/core/theme.dart';
 
 class KeywordsWidget extends StatefulWidget {
-  const KeywordsWidget({Key? key, required this.controller}) : super(key: key);
+  const KeywordsWidget({Key? key, this.controller, this.keywords}) : super(key: key);
 
-  final KeywordWidgetController controller;
+  final KeywordWidgetController? controller;
+  final List<String>? keywords;
 
   @override
   State<KeywordsWidget> createState() => _KeywordsWidgetState();
@@ -17,14 +18,15 @@ class _KeywordsWidgetState extends State<KeywordsWidget> {
   @override
   void initState() {
     super.initState();
-    widget.controller.addListener(() {
+    widget.controller?.addListener(() {
       if (mounted) setState(() {});
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    List<String> keywords = widget.controller.getKeywords();
+    List<String> keywords = widget.controller?.getKeywords() ?? [];
+    keywords.addAll(widget.keywords ?? []);
 
     return ListView.builder(
         itemCount: max(5, keywords.length),
@@ -36,11 +38,30 @@ class _KeywordsWidgetState extends State<KeywordsWidget> {
                       height: 50,
                       child: Align(
                         alignment: AlignmentDirectional.centerStart,
-                        child: GestureDetector(
-                          onTap: () {
-                            widget.controller.removeKeyword(idx);
-                          },
-                          child: KeywordCard(keyword: keywords[idx]),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                          child: Row(
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  keywords[idx],
+                                  style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              if (widget.controller != null) Row(
+                                children: [
+                                  const SizedBox(width: 10),
+                                  GestureDetector(
+                                    onTap: () {
+                                      widget.controller!.removeKeyword(idx);
+                                    },
+                                    child: Icon(FontAwesomeIcons.eraser, color: Theme.of(context).primaryColor),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     )
@@ -49,32 +70,6 @@ class _KeywordsWidgetState extends State<KeywordsWidget> {
             ],
           );
         });
-  }
-}
-
-class KeywordCard extends StatelessWidget {
-  const KeywordCard({Key? key, required this.keyword}) : super(key: key);
-
-  final String keyword;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-      child: Row(
-        children: [
-          Flexible(
-            child: Text(
-              keyword,
-              style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          const SizedBox(width: 10),
-          Icon(FontAwesomeIcons.eraser, color: Theme.of(context).primaryColor),
-        ],
-      ),
-    );
   }
 }
 

@@ -4,7 +4,7 @@ class NoTitleFrameView extends StatelessWidget {
   NoTitleFrameView({Key? key, required this.body, this.floatingActionButton}) : super(key: key);
 
   Widget body;
-  FloatingActionButton? floatingActionButton;
+  Widget? floatingActionButton;
 
   @override
   Widget build(BuildContext context) {

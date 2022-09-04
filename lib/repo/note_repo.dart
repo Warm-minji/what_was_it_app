@@ -170,7 +170,6 @@ class NoteRepo extends StateNotifier<List<Note>> {
       final scheduledDate = tz.TZDateTime(tz.local, alarmDate.year, alarmDate.month, alarmDate.day, alarmDate.hour, alarmDate.minute);
       result.add(scheduledDate);
     }
-    // result = [tz.TZDateTime.now(tz.local).add(const Duration(minutes: 1))]; // Test
     return result;
   }
 

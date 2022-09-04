@@ -50,37 +50,49 @@ class NoteListView extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) => NoTitleFrameView(
                     body: NoteDetailView(note: note),
-                    floatingActionButton: FloatingActionButton(
-                      child: const Icon(FontAwesomeIcons.trash),
-                      onPressed: () async {
-                        await showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('잠시만요'),
-                            content: const Text('정말 삭제하시겠어요?\n되돌릴 수 없습니다!'),
-                            actions: [
-                              Consumer(
-                                builder: (BuildContext context, WidgetRef ref, Widget? child) {
-                                  return TextButton(
+                    floatingActionButton: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        FloatingActionButton(
+                          heroTag: "delete",
+                          backgroundColor: Colors.red,
+                          onPressed: () async {
+                            await showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('잠시만요'),
+                                content: const Text('정말 삭제하시겠어요?\n되돌릴 수 없습니다!'),
+                                actions: [
+                                  Consumer(
+                                    builder: (BuildContext context, WidgetRef ref, Widget? child) {
+                                      return TextButton(
+                                        onPressed: () {
+                                          ref.read(noteRepoProvider.notifier).removeNote(idx);
+                                          Navigator.pop(context);
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('네', style: TextStyle(color: Colors.red)),
+                                      );
+                                    },
+                                  ),
+                                  TextButton(
                                     onPressed: () {
-                                      ref.read(noteRepoProvider.notifier).removeNote(idx);
-                                      Navigator.pop(context);
                                       Navigator.pop(context);
                                     },
-                                    child: const Text('네', style: TextStyle(color: Colors.red)),
-                                  );
-                                },
+                                    child: const Text('아니요'),
+                                  ),
+                                ],
                               ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: const Text('아니요'),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
+                            );
+                          },
+                          child: const Icon(FontAwesomeIcons.trash),
+                        ),
+                        const SizedBox(width: 10),
+                        FloatingActionButton(
+                          onPressed: () {  },
+                          child: const Icon(FontAwesomeIcons.pencil),
+                        ),
+                      ],
                     ),
                   ),
                 ),

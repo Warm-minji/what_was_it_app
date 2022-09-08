@@ -88,9 +88,16 @@ class NoteListView extends StatelessWidget {
                           child: const Icon(FontAwesomeIcons.trash),
                         ),
                         const SizedBox(width: 10),
-                        FloatingActionButton(
-                          onPressed: () {  },
-                          child: const Icon(FontAwesomeIcons.pencil),
+                        Consumer(
+                          builder: (BuildContext context, WidgetRef ref, Widget? child) {
+                            return FloatingActionButton(
+                              onPressed: () {
+                                final isNoteEditable = ref.read(isNoteEditableProvider.state);
+                                isNoteEditable.state = !isNoteEditable.state;
+                              },
+                              child: const Icon(FontAwesomeIcons.pencil),
+                            );
+                          },
                         ),
                       ],
                     ),

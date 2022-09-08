@@ -6,12 +6,12 @@ part 'note.g.dart';
 @JsonSerializable()
 class Note {
   String? noteId;
-  final String title;
-  final String category;
-  final List<String> keywords;
-  final List<DateTime> scheduledDates;
-  final RepeatType repeatType; // no repeat iff this value is null
-  final DateTime pubDate;
+  String title;
+  String category;
+  List<String> keywords;
+  List<DateTime> scheduledDates;
+  RepeatType repeatType; // no repeat iff this value is null
+  DateTime pubDate;
   List<Notification>? notifications;
 
   Note({

@@ -1,17 +1,43 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:what_was_it_app/core/date_functions.dart';
 import 'package:what_was_it_app/core/theme.dart';
 import 'package:what_was_it_app/model/note.dart';
 import 'package:what_was_it_app/view/component/keywords_widget.dart';
+import 'package:what_was_it_app/view/component/my_dialog.dart';
+import 'package:what_was_it_app/view/component/oscillating_container.dart';
 
-class NoteDetailView extends StatelessWidget {
-  const NoteDetailView({Key? key, required this.note}) : super(key: key);
+final isNoteEditableProvider = StateProvider.autoDispose((ref) => false);
 
-  final Note note;
+class NoteDetailView extends ConsumerStatefulWidget {
+  NoteDetailView({Key? key, required this.note}) : super(key: key);
+
+  Note note;
+
+  @override
+  ConsumerState<NoteDetailView> createState() => _NoteDetailViewState();
+}
+
+class _NoteDetailViewState extends ConsumerState<NoteDetailView> {
+  final TextEditingController keywordController = TextEditingController();
+  final KeywordWidgetController keywordWidgetController = KeywordWidgetController();
+
+  @override
+  void initState() {
+    super.initState();
+    widget.note.keywords.forEach(keywordWidgetController.addKeyword);
+    keywordWidgetController.addListener(() {
+      if (mounted) setState(() {});
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final isNoteEditable = ref.watch(isNoteEditableProvider);
+
     return Column(
       children: [
         SizedBox(
@@ -22,16 +48,55 @@ class NoteDetailView extends StatelessWidget {
               Icon(FontAwesomeIcons.noteSticky, color: Theme.of(context).primaryColor),
               const SizedBox(width: 10),
               Expanded(
-                child: Text(
-                  note.title,
-                  style: TextStyle(
-                    fontSize: 22,
-                    color: Theme.of(context).primaryColor,
-                    fontWeight: FontWeight.bold,
-                    decoration: TextDecoration.none,
-                    fontFamily: 'GowunDodum',
+                child: OscillatingContainer(
+                  onTap: () async {
+                    final newTitle = await showDialog(
+                        context: context,
+                        builder: (context) {
+                          String newTitle = "";
+
+                          return MyDialog(
+                            title: const Text("기억 노트 제목 수정"),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                TextField(
+                                  decoration: const InputDecoration(labelText: "새로운 제목을 입력해주세요."),
+                                  onChanged: (val) => newTitle = val,
+                                ),
+                              ],
+                            ),
+                            positiveAction: () {
+                              if (newTitle.isEmpty) {
+                                Navigator.pop(context);
+                              } else {
+                                Navigator.pop(context, newTitle);
+                              }
+                            },
+                            negativeAction: () {
+                              Navigator.pop(context);
+                            },
+                          );
+                        });
+                    if (newTitle == null) return;
+                    Map<String, dynamic> mapNote = jsonDecode(jsonEncode(widget.note));
+                    mapNote["title"] = newTitle;
+                    setState(() {
+                      widget.note = Note.fromJson(mapNote);
+                    });
+                  },
+                  child: Text(
+                    widget.note.title,
+                    style: TextStyle(
+                      fontSize: 22,
+                      color: Theme.of(context).primaryColor,
+                      fontWeight: FontWeight.bold,
+                      decoration: TextDecoration.none,
+                      fontFamily: 'GowunDodum',
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -55,10 +120,13 @@ class NoteDetailView extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       Expanded(
-                        child: Text(
-                          note.category,
-                          style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor),
-                          overflow: TextOverflow.ellipsis,
+                        child: OscillatingContainer(
+                          onTap: () {},
+                          child: Text(
+                            widget.note.category,
+                            style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
                     ],
@@ -74,88 +142,95 @@ class NoteDetailView extends StatelessWidget {
           child: Align(
             alignment: AlignmentDirectional.centerStart,
             child: Text(
-              '시작 날짜 : ${formatDate(note.pubDate)}',
+              '시작 날짜 : ${formatDate(widget.note.pubDate)}',
               style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor),
               overflow: TextOverflow.ellipsis,
             ),
           ),
         ),
         const Divider(thickness: 3, height: 0),
-        SizedBox(
-          height: 50,
-          child: Align(
-            alignment: AlignmentDirectional.centerStart,
-            child: Text(
-              '알람 종류 : ${(note.repeatType != RepeatType.none) ? '반복성 알람' : '일회성 알람'} [${note.scheduledDates.first.hour}시 ${note.scheduledDates.first.minute.toString().padLeft(2, "0")}분]',
-              style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ),
-        const Divider(thickness: 3, height: 0),
-        if (note.repeatType == RepeatType.none)
-          SizedBox(
-            height: 50,
-            child: Row(
-              children: [
-                Text(
-                  '시작일로부터',
-                  style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
-                ),
-                Icon(Icons.arrow_forward, color: Theme.of(context).primaryColor),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(vertical: 5),
-                    scrollDirection: Axis.horizontal,
-                    itemCount: note.scheduledDates.length,
-                    itemBuilder: (context, idx) {
-                      int offset = getOffset(note.scheduledDates[idx], note.pubDate);
-
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 5),
-                        child: Container(
-                          padding: const EdgeInsets.all(8.0),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Theme.of(context).primaryColor),
-                          ),
-                          child: Text(
-                            // '${(month != 0) ? '$month개월 ' : ''}'
-                            '$offset일 후',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          )
-        else
-          Column(
+        OscillatingContainer(
+          onTap: () {},
+          child: Column(
             children: [
               SizedBox(
                 height: 50,
                 child: Align(
+                  alignment: AlignmentDirectional.centerStart,
                   child: Text(
-                    getDescOfPeriodicAlarm(note).split("\n")[0],
-                    style: kLargeTextStyle.copyWith(color: Theme.of(context).primaryColor),
+                    '알람 종류 : ${(widget.note.repeatType != RepeatType.none) ? '반복성 알람' : '일회성 알람'} [${widget.note.scheduledDates.first.hour}시 ${widget.note.scheduledDates.first.minute.toString().padLeft(2, "0")}분]',
+                    style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ),
               const Divider(thickness: 3, height: 0),
-              SizedBox(
-                height: 50,
-                child: Align(
-                  child: Text(
-                    getDescOfPeriodicAlarm(note).split("\n")[1],
-                    style: kLargeTextStyle.copyWith(color: Theme.of(context).primaryColor),
+              if (widget.note.repeatType == RepeatType.none)
+                SizedBox(
+                  height: 50,
+                  child: Row(
+                    children: [
+                      Text(
+                        '시작일로부터',
+                        style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
+                      ),
+                      Icon(Icons.arrow_forward, color: Theme.of(context).primaryColor),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: ListView.builder(
+                          padding: const EdgeInsets.symmetric(vertical: 5),
+                          scrollDirection: Axis.horizontal,
+                          itemCount: widget.note.scheduledDates.length,
+                          itemBuilder: (context, idx) {
+                            int offset = getOffset(widget.note.scheduledDates[idx], widget.note.pubDate);
+
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 5),
+                              child: Container(
+                                padding: const EdgeInsets.all(8.0),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Theme.of(context).primaryColor),
+                                ),
+                                child: Text(
+                                  // '${(month != 0) ? '$month개월 ' : ''}'
+                                  '$offset일 후',
+                                  style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
+                )
+              else
+                Column(
+                  children: [
+                    SizedBox(
+                      height: 50,
+                      child: Align(
+                        child: Text(
+                          getDescOfPeriodicAlarm(widget.note).split("\n")[0],
+                          style: kLargeTextStyle.copyWith(color: Theme.of(context).primaryColor),
+                        ),
+                      ),
+                    ),
+                    const Divider(thickness: 3, height: 0),
+                    SizedBox(
+                      height: 50,
+                      child: Align(
+                        child: Text(
+                          getDescOfPeriodicAlarm(widget.note).split("\n")[1],
+                          style: kLargeTextStyle.copyWith(color: Theme.of(context).primaryColor),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
             ],
           ),
+        ),
         const Divider(thickness: 3, height: 0),
         const SizedBox(height: 50),
         const Divider(thickness: 3, height: 0),
@@ -180,7 +255,25 @@ class NoteDetailView extends StatelessWidget {
           ),
         ),
         const Divider(thickness: 3, height: 0),
-        Expanded(child: KeywordsWidget(keywords: note.keywords)),
+        if (isNoteEditable)
+          SizedBox(
+            height: 50,
+            child: OscillatingContainer(
+              onTap: () {},
+              child: TextField(
+                controller: keywordController,
+                style: kLargeTextStyle.copyWith(fontWeight: FontWeight.normal, color: Theme.of(context).primaryColor),
+                decoration: const InputDecoration(labelText: '', hintText: '추가할 키워드 입력 후 엔터!', prefixIcon: Icon(Icons.arrow_forward), contentPadding: EdgeInsets.zero),
+                onSubmitted: (val) {
+                  val = val.trim();
+                  if (val.isEmpty) return;
+                  keywordWidgetController.addKeyword(val);
+                  keywordController.clear();
+                },
+              ),
+            ),
+          ),
+        Expanded(child: KeywordsWidget(controller: keywordWidgetController, isEditable: isNoteEditable)),
       ],
     );
   }

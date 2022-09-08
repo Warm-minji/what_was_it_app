@@ -245,35 +245,25 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
                   return;
                 }
 
-                final data = ref.read(AddNoteScreen.addNoteDataProvider);
+                final note = ref.read(addNoteDataProvider);
 
-                data['category'] = _categoryController.text;
-                data['scheduleDates'] = (isAlarmTypeRepeatable) ? [alarmStartsAt] : _alarmController.getAlarmList();
-                data['repeatType'] = repeatType;
-                data['pubDate'] = now;
+                note.category = _categoryController.text;
+                note.scheduledDates = (isAlarmTypeRepeatable) ? [alarmStartsAt] : _alarmController.getAlarmList();
+                note.repeatType = repeatType;
+                note.pubDate = now;
 
                 final Time? alarmTime = await showSettings(context);
                 if (alarmTime == null) return;
 
-                List<DateTime> scheduleDates = data["scheduleDates"];
+                List<DateTime> scheduleDates = note.scheduledDates;
                 List<DateTime> alarmTimeAppliedDates = [];
                 for (DateTime date in scheduleDates) {
                   alarmTimeAppliedDates.add(DateTime(date.year, date.month, date.day, alarmTime.hour, alarmTime.minute));
                 }
-                data["scheduleDates"] = alarmTimeAppliedDates;
+                note.scheduledDates = alarmTimeAppliedDates;
 
                 if (mounted) {
-                  Navigator.pop(
-                    context,
-                    Note(
-                      title: data['title'],
-                      category: data['category'],
-                      keywords: data['keywords'],
-                      scheduledDates: data['scheduleDates'],
-                      repeatType: data['repeatType'],
-                      pubDate: data['pubDate'],
-                    ),
-                  );
+                  Navigator.pop(context, note);
                 }
               },
               child: const Icon(Icons.send),

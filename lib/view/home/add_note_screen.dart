@@ -8,16 +8,14 @@ import 'package:what_was_it_app/view/component/keywords_widget.dart';
 import 'package:what_was_it_app/view/component/no_title_frame_view.dart';
 import 'package:what_was_it_app/view/home/add_note_alarm_screen.dart';
 
-final noteProvider = StateProvider(
-  (ref) => Note(
-    title: "",
-    category: "",
-    keywords: [],
-    scheduledDates: [],
-    repeatType: RepeatType.none,
-    pubDate: DateTime.now(),
-  ),
-);
+final addNoteDataProvider = Provider((ref) => Note(
+      title: "",
+      category: "",
+      keywords: [],
+      scheduledDates: [],
+      repeatType: RepeatType.none,
+      pubDate: DateTime.now(),
+    ));
 
 class AddNoteScreen extends ConsumerStatefulWidget {
   const AddNoteScreen({Key? key}) : super(key: key);
@@ -160,8 +158,8 @@ class _AddNoteWidgetState extends ConsumerState<AddNoteScreen> with SingleTicker
                 final val = keywordController.text;
                 if (val.isNotEmpty) keywordWidgetController.addKeyword(val);
 
-                ref.read(AddNoteScreen.addNoteDataProvider)['title'] = titleController.text;
-                ref.read(AddNoteScreen.addNoteDataProvider)['keywords'] = keywordWidgetController.getKeywords();
+                ref.read(addNoteDataProvider).title = titleController.text;
+                ref.read(addNoteDataProvider).keywords = keywordWidgetController.getKeywords();
                 Navigator.pop(
                   context,
                   await Navigator.push(

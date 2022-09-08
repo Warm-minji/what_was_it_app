@@ -4,29 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:what_was_it_app/core/theme.dart';
 
-class KeywordsWidget extends StatefulWidget {
-  const KeywordsWidget({Key? key, this.controller, this.keywords}) : super(key: key);
+class KeywordsWidget extends StatelessWidget {
+  const KeywordsWidget({Key? key, required this.controller, this.isEditable = true}) : super(key: key);
 
-  final KeywordWidgetController? controller;
-  final List<String>? keywords;
-
-  @override
-  State<KeywordsWidget> createState() => _KeywordsWidgetState();
-}
-
-class _KeywordsWidgetState extends State<KeywordsWidget> {
-  @override
-  void initState() {
-    super.initState();
-    widget.controller?.addListener(() {
-      if (mounted) setState(() {});
-    });
-  }
+  final KeywordWidgetController controller;
+  final bool isEditable;
 
   @override
   Widget build(BuildContext context) {
-    List<String> keywords = widget.controller?.getKeywords() ?? [];
-    keywords.addAll(widget.keywords ?? []);
+    List<String> keywords = controller.getKeywords();
 
     return ListView.builder(
         itemCount: max(5, keywords.length),
@@ -49,17 +35,18 @@ class _KeywordsWidgetState extends State<KeywordsWidget> {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                              if (widget.controller != null) Row(
-                                children: [
-                                  const SizedBox(width: 10),
-                                  GestureDetector(
-                                    onTap: () {
-                                      widget.controller!.removeKeyword(idx);
-                                    },
-                                    child: Icon(FontAwesomeIcons.eraser, color: Theme.of(context).primaryColor),
-                                  ),
-                                ],
-                              ),
+                              if (isEditable)
+                                Row(
+                                  children: [
+                                    const SizedBox(width: 10),
+                                    InkWell(
+                                      onTap: () {
+                                        controller.removeKeyword(idx);
+                                      },
+                                      child: Icon(FontAwesomeIcons.eraser, color: Theme.of(context).primaryColor),
+                                    ),
+                                  ],
+                                ),
                             ],
                           ),
                         ),

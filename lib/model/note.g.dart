@@ -19,9 +19,10 @@ Note _$NoteFromJson(Map<String, dynamic> json) => Note(
       notifications: (json['notifications'] as List<dynamic>?)
           ?.map((e) => Notification.fromJson(e as Map<String, dynamic>))
           .toList(),
-    );
+    )..noteId = json['noteId'] as String?;
 
 Map<String, dynamic> _$NoteToJson(Note instance) => <String, dynamic>{
+      'noteId': instance.noteId,
       'title': instance.title,
       'category': instance.category,
       'keywords': instance.keywords,

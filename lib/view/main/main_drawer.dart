@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:what_was_it_app/core/notification_plugin.dart';
 import 'package:what_was_it_app/core/provider.dart';
-import 'package:what_was_it_app/core/shared_preferences.dart';
 import 'package:what_was_it_app/core/theme.dart';
 import 'package:what_was_it_app/view/guide/guide_home.dart';
 import 'package:what_was_it_app/view/main/main_drawer_item.dart';
@@ -133,7 +132,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                                     TextButton(
                                       onPressed: () async {
                                         await flutterLocalNotificationsPlugin.cancelAll();
-                                        await prefs.clear();
+                                        await ref.read(noteRepoProvider).clearDB();
                                         if (mounted) Phoenix.rebirth(context);
                                       },
                                       child: const Text("삭제", style: TextStyle(color: Colors.red)),

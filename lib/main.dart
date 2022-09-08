@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:what_was_it_app/core/notification_plugin.dart';
-import 'package:what_was_it_app/core/shared_preferences.dart';
 import 'package:what_was_it_app/view/main/intro.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -13,15 +11,9 @@ import 'package:timezone/timezone.dart' as tz;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await _loadSharedPreferences();
-  // await prefs.clear(); // clear all
   await _initializeNotification();
 
   runApp(Phoenix(child: const MyApp()));
-}
-
-Future _loadSharedPreferences() async {
-  prefs = await SharedPreferences.getInstance();
 }
 
 Future _initializeNotification() async {

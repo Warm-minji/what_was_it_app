@@ -1,32 +1,53 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:localstore/localstore.dart';
 import 'package:what_was_it_app/core/notification_plugin.dart';
-import 'package:what_was_it_app/core/shared_preferences.dart';
 import 'package:what_was_it_app/model/note.dart';
-import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:http/http.dart' as http;
 import 'package:what_was_it_app/model/notification.dart';
 
-class NoteRepo extends StateNotifier<List<Note>> {
+class NoteRepo {
   static const String host = "disconnect server"; // 15.164.144.82:8080
 
-  NoteRepo(List<Note> list) : super(list);
+  final Localstore db;
+
+  NoteRepo(this.db);
 
   Future saveNote(Note note) async {
-    state = [note, ...state];
     await _registerNoteToNotificationSystem(note);
-    await _saveNotesInLocal(state);
+    await _saveNoteLocal(note);
   }
 
-  Future removeNote(int index) async {
-    await _removeNotification(state.elementAt(index));
-    state.removeAt(index);
-    state = [...state];
-    await _saveNotesInLocal(state);
+  Future removeNote(Note note) async {
+    await _removeNotification(note);
+    await _removeNoteLocal(note);
+  }
+
+  Future clearDB() async {
+    await _clearDBTable("notes");
+    await _clearDBTable("core");
+  }
+
+  Future _clearDBTable(String tableName) async {
+    Map? all = await db.collection(tableName).get();
+    if (all != null) {
+      for (var key in all.keys) {
+        key = key.toString().replaceAll("/$tableName/", "");
+        await db.collection(tableName).doc(key).delete();
+      }
+    }
+  }
+
+  Stream<List<Note>> getNoteStream() async* {
+    List<Note> result = [];
+    final stream = db.collection("notes").stream;
+    await for (var note in stream) {
+      print(note);
+      result.add(Note.fromJson(note));
+      yield result;
+    }
   }
 
   Future<bool> checkServerConnection() async {
@@ -42,115 +63,122 @@ class NoteRepo extends StateNotifier<List<Note>> {
 
       // TODO 404로 체크하는 방법 말고 괜찮은 방법이 있을까..
       if (res.statusCode == 404) check = true;
-    } on Exception catch(e) {
+    } on Exception catch (e) {
       return false;
     }
 
     return check;
   }
 
-  Future loadFromRemote(String userId, String password) async {
-    // throw Exception("err");
-    final url = Uri.http(host, "/api/restore", {
-      "memberId": userId,
-      "password": password,
-    });
-    final req = http.Request("GET", url);
+  // Future loadFromRemote(String userId, String password) async {
+  //   // throw Exception("err");
+  //   final url = Uri.http(host, "/api/restore", {
+  //     "memberId": userId,
+  //     "password": password,
+  //   });
+  //   final req = http.Request("GET", url);
+  //
+  //   final res = await req.send().timeout(const Duration(seconds: 3), onTimeout: () {
+  //     throw Exception("request timeout");
+  //   });
+  //   if (res.statusCode != 200) {
+  //     throw HttpException(jsonDecode(await res.stream.bytesToString())["errorMessage"]);
+  //   }
+  //
+  //   List<dynamic> mapNotes = jsonDecode(await res.stream.bytesToString());
+  //
+  //   // print(mapNotes);
+  //   List<Map<String, dynamic>> listNotes = [];
+  //   for (Map<String, dynamic> mapNote in mapNotes) {
+  //     mapNote["pubDate"] = mapNote["publishedDate"];
+  //     switch (mapNote["repeatType"]) {
+  //       case "NONE":
+  //         mapNote["repeatType"] = "none";
+  //         break;
+  //       case "DAILY":
+  //         mapNote["repeatType"] = "daily";
+  //         break;
+  //       case "WEEKLY":
+  //         mapNote["repeatType"] = "weekly";
+  //         break;
+  //       case "MONTHLY":
+  //         mapNote["repeatType"] = "monthly";
+  //         break;
+  //       case "YEARLY":
+  //         mapNote["repeatType"] = "yearly";
+  //         break;
+  //     }
+  //     listNotes.add(mapNote);
+  //   }
+  //
+  //   List<Note> result = [];
+  //   for (Map<String, dynamic> mapNote in listNotes) {
+  //     // print(mapNote);
+  //     result.add(Note.fromJson(mapNote));
+  //   }
+  //
+  //   state = [];
+  //   await prefs.clear();
+  //   await flutterLocalNotificationsPlugin.cancelAll();
+  //   for (Note note in result) {
+  //     await saveNote(note);
+  //   }
+  // }
 
-    final res = await req.send().timeout(const Duration(seconds: 3), onTimeout: () {
-      throw Exception("request timeout");
-    });
-    if (res.statusCode != 200) {
-      throw HttpException(jsonDecode(await res.stream.bytesToString())["errorMessage"]);
-    }
+  // Future saveToRemote(String userId, String password, List<Note> notes) async {
+  //   // throw Exception("err");
+  //   final url = Uri.http(host, "/api/backup");
+  //   final req = http.Request("POST", url);
+  //   req.headers[HttpHeaders.contentTypeHeader] = "application/json";
+  //
+  //   List<Map<String, dynamic>> listNotes = [];
+  //
+  //   List<dynamic> mapNotes = jsonDecode(jsonEncode(notes));
+  //   for (Map<String, dynamic> mapNote in mapNotes) {
+  //     mapNote["memberId"] = userId;
+  //     switch (mapNote["repeatType"]) {
+  //       case "none":
+  //         mapNote["repeatType"] = "NONE";
+  //         break;
+  //       case "daily":
+  //         mapNote["repeatType"] = "DAILY";
+  //         break;
+  //       case "weekly":
+  //         mapNote["repeatType"] = "WEEKLY";
+  //         break;
+  //       case "monthly":
+  //         mapNote["repeatType"] = "MONTHLY";
+  //         break;
+  //       case "yearly":
+  //         mapNote["repeatType"] = "YEARLY";
+  //         break;
+  //     }
+  //     listNotes.add(mapNote);
+  //   }
+  //
+  //   req.body = jsonEncode({
+  //     "memberId": userId,
+  //     "password": password,
+  //     "notes": listNotes,
+  //   });
+  //
+  //   final res = await req.send().timeout(const Duration(seconds: 3), onTimeout: () {
+  //     throw Exception("request timeout");
+  //   });
+  //   if (res.statusCode != 200) {
+  //     throw HttpException(jsonDecode(await res.stream.bytesToString())["errorMessage"]);
+  //   }
+  // }
 
-    List<dynamic> mapNotes = jsonDecode(await res.stream.bytesToString());
-
-    // print(mapNotes);
-    List<Map<String, dynamic>> listNotes = [];
-    for (Map<String, dynamic> mapNote in mapNotes) {
-      mapNote["pubDate"] = mapNote["publishedDate"];
-      switch (mapNote["repeatType"]) {
-        case "NONE":
-          mapNote["repeatType"] = "none";
-          break;
-        case "DAILY":
-          mapNote["repeatType"] = "daily";
-          break;
-        case "WEEKLY":
-          mapNote["repeatType"] = "weekly";
-          break;
-        case "MONTHLY":
-          mapNote["repeatType"] = "monthly";
-          break;
-        case "YEARLY":
-          mapNote["repeatType"] = "yearly";
-          break;
-      }
-      listNotes.add(mapNote);
-    }
-
-    List<Note> result = [];
-    for (Map<String, dynamic> mapNote in listNotes) {
-      // print(mapNote);
-      result.add(Note.fromJson(mapNote));
-    }
-
-    state = [];
-    await prefs.clear();
-    await flutterLocalNotificationsPlugin.cancelAll();
-    for (Note note in result) {
-      await saveNote(note);
-    }
+  Future _saveNoteLocal(Note note) async {
+    final noteId = db.collection("notes").doc().id;
+    note.noteId = noteId;
+    await db.collection("notes").doc(noteId).set(jsonDecode(jsonEncode(note)));
   }
 
-  Future saveToRemote(String userId, String password, List<Note> notes) async {
-    // throw Exception("err");
-    final url = Uri.http(host, "/api/backup");
-    final req = http.Request("POST", url);
-    req.headers[HttpHeaders.contentTypeHeader] = "application/json";
-
-    List<Map<String, dynamic>> listNotes = [];
-
-    List<dynamic> mapNotes = jsonDecode(jsonEncode(notes));
-    for (Map<String, dynamic> mapNote in mapNotes) {
-      mapNote["memberId"] = userId;
-      switch (mapNote["repeatType"]) {
-        case "none":
-          mapNote["repeatType"] = "NONE";
-          break;
-        case "daily":
-          mapNote["repeatType"] = "DAILY";
-          break;
-        case "weekly":
-          mapNote["repeatType"] = "WEEKLY";
-          break;
-        case "monthly":
-          mapNote["repeatType"] = "MONTHLY";
-          break;
-        case "yearly":
-          mapNote["repeatType"] = "YEARLY";
-          break;
-      }
-      listNotes.add(mapNote);
-    }
-
-    req.body = jsonEncode({
-      "memberId": userId,
-      "password": password,
-      "notes": listNotes,
-    });
-
-    final res = await req.send().timeout(const Duration(seconds: 3), onTimeout: () {
-      throw Exception("request timeout");
-    });
-    if (res.statusCode != 200) {
-      throw HttpException(jsonDecode(await res.stream.bytesToString())["errorMessage"]);
-    }
-  }
-
-  Future _saveNotesInLocal(List<Note> notes) async {
-    await prefs.setString("notes", jsonEncode(notes));
+  Future _removeNoteLocal(Note note) async {
+    final noteId = note.noteId;
+    await db.collection("notes").doc(noteId).delete();
   }
 
   Future _removeNotification(Note note) async {
@@ -174,7 +202,7 @@ class NoteRepo extends StateNotifier<List<Note>> {
   }
 
   Future _registerNoteToNotificationSystem(Note note) async {
-    int notificationId = _getNextNotificationId();
+    int notificationId = await _getNextNotificationId();
 
     for (tz.TZDateTime scheduledDate in _getNoteAlarmDate(note)) {
       // TODO map 동작 안하는데 왜 그런지 알아보기
@@ -186,12 +214,12 @@ class NoteRepo extends StateNotifier<List<Note>> {
     await _setNextNotificationId(notificationId);
   }
 
-  int _getNextNotificationId() {
-    return prefs.getInt("notificationId") ?? 0;
+  Future<int> _getNextNotificationId() async {
+    return (await db.collection("core").doc("notificationId").get())?["id"] ?? 0;
   }
 
   Future<void> _setNextNotificationId(int id) async {
-    await prefs.setInt("notificationId", id);
+    await db.collection("core").doc("notificationId").set({"id": id});
   }
 
   Future<void> _addNotification(tz.TZDateTime scheduledDate, Note note, int notificationId) async {

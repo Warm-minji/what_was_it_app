@@ -13,7 +13,7 @@ class MyNoteListView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
-    List<Note> noteList = ref.watch(noteRepoProvider);
+    List<Note> noteList = ref.watch(noteProvider).value ?? [];
 
     return NoTitleFrameView(
       body: Column(

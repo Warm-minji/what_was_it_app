@@ -22,13 +22,13 @@ dependencies:
   json_annotation: ^4.6.0
   flutter_riverpod: ^1.0.4
   clickable_list_wheel_view: ^0.1.0
-  shared_preferences: ^2.0.15
   syncfusion_flutter_datepicker: ^20.2.40
   flutter_local_notifications: ^9.7.0
   flutter_phoenix: ^1.0.0
   http: ^0.13.5
   url_launcher: ^6.1.5
   notification_permissions: ^0.6.1
+  localstore: ^1.2.3
 
 dev_dependencies:
   flutter_test:

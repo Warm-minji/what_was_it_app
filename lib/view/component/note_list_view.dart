@@ -67,7 +67,7 @@ class NoteListView extends StatelessWidget {
                                     builder: (BuildContext context, WidgetRef ref, Widget? child) {
                                       return TextButton(
                                         onPressed: () {
-                                          ref.read(noteRepoProvider.notifier).removeNote(idx);
+                                          ref.read(noteRepoProvider).removeNote(note);
                                           Navigator.pop(context);
                                           Navigator.pop(context);
                                         },

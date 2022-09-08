@@ -5,6 +5,7 @@ part 'note.g.dart';
 
 @JsonSerializable()
 class Note {
+  String? noteId;
   final String title;
   final String category;
   final List<String> keywords;

@@ -27,10 +27,10 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
   }
 
   Future _checkServerLive() async {
-    final check = await ref.read(noteRepoProvider.notifier).checkServerConnection();
+    // final check = await ref.read(noteRepoProvider.notifier).checkServerConnection(); // TODO
     if (mounted) {
       setState(() {
-        isServerLive = check;
+        // isServerLive = check;
       });
     }
   }
@@ -238,7 +238,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                                   }
                                   if (saveMode) {
                                     try {
-                                      await ref.read(noteRepoProvider.notifier).saveToRemote(userId, password, ref.read(noteRepoProvider));
+                                      // await ref.read(noteRepoProvider.notifier).saveToRemote(userId, password, ref.read(noteRepoProvider)); // TODO
                                       if (mounted) {
                                         Navigator.pop(context);
                                         Navigator.pop(context);
@@ -255,7 +255,7 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
                                     }
                                   } else {
                                     try {
-                                      await ref.read(noteRepoProvider.notifier).loadFromRemote(userId, password);
+                                      // await ref.read(noteRepoProvider.notifier).loadFromRemote(userId, password); // TODO
                                       if (mounted) {
                                         Navigator.pop(context);
                                         Navigator.pop(context);

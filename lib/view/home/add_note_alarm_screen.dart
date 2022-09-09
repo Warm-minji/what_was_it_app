@@ -181,8 +181,8 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
                   selectionMode: (isAlarmTypeRepeatable) ? DateRangePickerSelectionMode.single : DateRangePickerSelectionMode.multiple,
                   enablePastDates: false,
                   showNavigationArrow: true,
-                  initialSelectedDate: ref.read(addNoteDataProvider).scheduledDates.first,
-                  initialSelectedDates: ref.read(addNoteDataProvider).scheduledDates,
+                  initialSelectedDate: (ref.read(addNoteDataProvider).scheduledDates.isNotEmpty) ? ref.read(addNoteDataProvider).scheduledDates.first : null,
+                  initialSelectedDates: (ref.read(addNoteDataProvider).scheduledDates.isNotEmpty) ? ref.read(addNoteDataProvider).scheduledDates: null,
                   onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
                     if (isAlarmTypeRepeatable) {
                       DateTime selected = args.value as DateTime;

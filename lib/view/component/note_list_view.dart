@@ -8,6 +8,7 @@ import 'package:what_was_it_app/model/alarm_note.dart';
 import 'package:what_was_it_app/model/note.dart';
 import 'package:what_was_it_app/view/component/no_title_frame_view.dart';
 import 'package:what_was_it_app/view/component/note_detail_view.dart';
+import 'package:what_was_it_app/view/home/add_note_screen.dart';
 
 class NoteListView extends StatelessWidget {
   NoteListView({Key? key, this.noteList, this.alarmNoteList}) : super(key: key);
@@ -91,9 +92,14 @@ class NoteListView extends StatelessWidget {
                         Consumer(
                           builder: (BuildContext context, WidgetRef ref, Widget? child) {
                             return FloatingActionButton(
-                              onPressed: () {
-                                final isNoteEditable = ref.read(isNoteEditableProvider.state);
-                                isNoteEditable.state = !isNoteEditable.state;
+                              onPressed: () async {
+                                final newNote = await Navigator.push(context, MaterialPageRoute(builder: (context) => AddNoteScreen(note: note)));
+                                if (newNote == null) return;
+                                Navigator.pop(context); // TODO
+                                if (note.noteId != null) {
+                                  await ref.read(noteRepoProvider).modifyNote(note.noteId!, newNote);
+                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("수정되었습니다.")));
+                                }
                               },
                               child: const Icon(FontAwesomeIcons.pencil),
                             );

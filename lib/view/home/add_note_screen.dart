@@ -18,9 +18,9 @@ final addNoteDataProvider = Provider((ref) => Note(
     ));
 
 class AddNoteScreen extends ConsumerStatefulWidget {
-  const AddNoteScreen({Key? key}) : super(key: key);
+  const AddNoteScreen({Key? key, this.note}) : super(key: key);
 
-  static final addNoteDataProvider = Provider<Map<String, dynamic>>((ref) => {});
+  final Note? note;
 
   @override
   ConsumerState<AddNoteScreen> createState() => _AddNoteWidgetState();
@@ -42,6 +42,24 @@ class _AddNoteWidgetState extends ConsumerState<AddNoteScreen> with SingleTicker
     keywordController = TextEditingController();
 
     keywordWidgetController = KeywordWidgetController();
+
+    if (widget.note != null) {
+      // modify mode
+      final data = ref.read(addNoteDataProvider);
+      data.noteId = widget.note!.noteId;
+      data.title = widget.note!.title;
+      data.category = widget.note!.category;
+      data.keywords = widget.note!.keywords;
+      data.scheduledDates = widget.note!.scheduledDates;
+      data.repeatType = widget.note!.repeatType;
+      data.pubDate = widget.note!.pubDate;
+      data.notifications = widget.note!.notifications;
+
+      titleController.text = data.title;
+      data.keywords.forEach(keywordWidgetController.addKeyword);
+      couldMoveToNext = true;
+    }
+
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       keywordWidgetController.addListener(() {
         if (mounted) {

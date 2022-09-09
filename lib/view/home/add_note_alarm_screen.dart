@@ -33,6 +33,14 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
   @override
   void initState() {
     super.initState();
+
+    final data = ref.read(addNoteDataProvider);
+    _categoryController.text = data.category;
+    data.scheduledDates.forEach(_alarmController.addAlarm);
+    repeatType = data.repeatType;
+    isAlarmTypeRepeatable = data.repeatType != RepeatType.none;
+    couldMoveToNext = !isFormEmpty();
+
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       _alarmController.addListener(() {
         if (mounted) {
@@ -173,7 +181,8 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
                   selectionMode: (isAlarmTypeRepeatable) ? DateRangePickerSelectionMode.single : DateRangePickerSelectionMode.multiple,
                   enablePastDates: false,
                   showNavigationArrow: true,
-                  initialSelectedDate: DateTime.now(),
+                  initialSelectedDate: ref.read(addNoteDataProvider).scheduledDates.first,
+                  initialSelectedDates: ref.read(addNoteDataProvider).scheduledDates,
                   onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
                     if (isAlarmTypeRepeatable) {
                       DateTime selected = args.value as DateTime;

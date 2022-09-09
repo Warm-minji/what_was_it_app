@@ -7,6 +7,7 @@ import 'package:what_was_it_app/model/note.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:http/http.dart' as http;
 import 'package:what_was_it_app/model/notification.dart';
+import 'package:collection/collection.dart';
 
 class NoteRepo {
   static const String host = "disconnect server"; // 15.164.144.82:8080
@@ -23,6 +24,16 @@ class NoteRepo {
   Future removeNote(Note note) async {
     await _removeNotification(note);
     await _removeNoteLocal(note);
+  }
+
+  Future modifyNote(String noteId, Note newNote) async {
+    final mapOldNote = await db.collection("notes").doc(noteId).get();
+    if (mapOldNote == null) return;
+
+    final oldNote = Note.fromJson(mapOldNote);
+    await db.collection("notes").doc(noteId).set(jsonDecode(jsonEncode(newNote)));
+    await _removeNotification(oldNote);
+    await _registerNoteToNotificationSystem(newNote);
   }
 
   Future clearDB() async {
@@ -43,9 +54,14 @@ class NoteRepo {
   Stream<List<Note>> getNoteStream() async* {
     List<Note> result = [];
     final stream = db.collection("notes").stream;
-    await for (var note in stream) {
-      print(note);
-      result.add(Note.fromJson(note));
+    await for (var mapNote in stream) {
+      Note tempNote = Note.fromJson(mapNote);
+      Note? note = result.firstWhereOrNull((element) => element.noteId == tempNote.noteId);
+      if (note == null) {
+        result.add(tempNote);
+      } else {
+        result[result.indexOf(note)] = tempNote;
+      }
       yield result;
     }
   }

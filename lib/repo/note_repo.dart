@@ -219,7 +219,6 @@ class NoteRepo {
 
   Future _removeNotification(Note note) async {
     if (note.notifications != null && note.notifications!.isNotEmpty) {
-      // TODO map 관련 확인
       for (int notificationId in note.notifications!.map((e) => e.notificationId)) {
         await flutterLocalNotificationsPlugin.cancel(notificationId);
       }

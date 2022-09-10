@@ -1,15 +1,10 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:what_was_it_app/core/date_functions.dart';
-import 'package:what_was_it_app/core/provider.dart';
 import 'package:what_was_it_app/core/theme.dart';
 import 'package:what_was_it_app/model/note.dart';
 import 'package:what_was_it_app/view/component/keywords_widget.dart';
-import 'package:what_was_it_app/view/component/my_dialog.dart';
-import 'package:what_was_it_app/view/component/oscillating_container.dart';
 
 final isNoteEditableProvider = StateProvider.autoDispose((ref) => false);
 

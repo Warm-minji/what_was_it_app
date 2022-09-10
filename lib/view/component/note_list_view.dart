@@ -25,6 +25,7 @@ class NoteListView extends StatelessWidget {
     }
 
     List<Note> selectedNotes = (showAlarmDate) ? alarmNoteList!.map((e) => e.note).toList() : noteList ?? [];
+    selectedNotes.sort((a, b) => b.pubDate.compareTo(a.pubDate));
 
     return ListView.builder(
       itemCount: selectedNotes.length,
@@ -134,10 +135,12 @@ class NoteListView extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 20),
-                  Text(
-                    (note.repeatType != RepeatType.none) ? getDescOfPeriodicAlarm(note) : dateString,
-                    textAlign: TextAlign.right,
-                  ),
+                  if (showAlarmDate)
+                    Text(
+                      (note.repeatType != RepeatType.none) ? getDescOfPeriodicAlarm(note) : dateString,
+                      textAlign: TextAlign.right,
+                    ),
+                  if (!showAlarmDate) Text("${formatDate(note.pubDate)} 등록"),
                 ],
               ),
             ),

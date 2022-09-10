@@ -8,6 +8,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:notification_permissions/notification_permissions.dart';
 import 'package:what_was_it_app/core/provider.dart';
 import 'package:what_was_it_app/model/note.dart';
+import 'package:what_was_it_app/view/component/my_dialog.dart';
+import 'package:what_was_it_app/view/guide/onboarding_view.dart';
 import 'package:what_was_it_app/view/home/add_note_screen.dart';
 import 'package:what_was_it_app/view/component/icon_card_widget.dart';
 import 'package:what_was_it_app/view/home/upcoming_alarm_list_view.dart';
@@ -128,24 +130,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         actions: [
           InkWell(
             onTap: () async {
-              await _refreshPermission();
-              if (_notificationPerm) {
-                showModalBottomSheet(
-                    context: context,
-                    builder: (context) {
-                      return const UpcomingAlarmListView();
-                    });
-              } else {
-                if (Platform.isIOS) {
-                  await _showCupertinoStylePermRequest();
-                } else {
-                  await _showAndroidStylePermRequest();
-                }
-              }
+              showDialog(
+                context: context,
+                builder: (context) => MyDialog(
+                  title: const Text("튜토리얼"),
+                  content: const Text("튜토리얼을 다시 보시겠어요?"),
+                  positiveAction: () async {
+                    Navigator.pop(context);
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => OnboardingView()));
+                  },
+                  negativeAction: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              );
             },
             child: ConstrainedBox(
               constraints: appBarLeadingIconConstraints,
-              child: (_notificationPerm) ? const Icon(FontAwesomeIcons.bell) : const Icon(FontAwesomeIcons.bellSlash),
+              child: const Icon(FontAwesomeIcons.question),
             ),
           ),
         ],
@@ -179,6 +181,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         ],
       ),
       drawer: const MainDrawer(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          await _refreshPermission();
+          if (_notificationPerm) {
+            showModalBottomSheet(
+                context: context,
+                builder: (context) {
+                  return const UpcomingAlarmListView();
+                });
+          } else {
+            if (Platform.isIOS) {
+              await _showCupertinoStylePermRequest();
+            } else {
+              await _showAndroidStylePermRequest();
+            }
+          }
+        },
+        child: (_notificationPerm) ? const Icon(FontAwesomeIcons.bell) : const Icon(FontAwesomeIcons.bellSlash),
+      ),
     );
   }
 }

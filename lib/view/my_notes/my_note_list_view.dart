@@ -20,7 +20,7 @@ class _MyNoteListViewState extends ConsumerState<MyNoteListView> {
 
   @override
   Widget build(BuildContext context) {
-    List<Note> noteList = ref.watch(noteProvider).value ?? [];
+    List<Note> noteList = ref.watch(noteProvider);
     List<Note> filteredNoteList = noteList.where((element) => element.category.replaceAll(" ", "").contains(filter)).toList();
 
     return NoTitleFrameView(

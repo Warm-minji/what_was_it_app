@@ -161,7 +161,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
               Note? note = await Navigator.push(context, MaterialPageRoute(builder: (context) => const AddNoteScreen()));
               if (note == null) return;
 
-              ref.read(noteRepoProvider).saveNote(note);
+              ref.read(noteProvider.notifier).saveNote(note);
             },
             child: IconCardWidget(icon: Icons.add_circle_outline, title: '기억 노트 추가하기'),
           ),

@@ -114,7 +114,7 @@ class _UpcomingAlarmListViewState extends ConsumerState<UpcomingAlarmListView> {
               builder: (BuildContext context, AsyncSnapshot<List<PendingNotificationRequest>> snapshot) {
                 if (snapshot.data?.isEmpty ?? true) return Container();
 
-                List<Note> noteList = ref.watch(noteProvider).value ?? [];
+                List<Note> noteList = ref.watch(noteProvider);
 
                 final upcomingAlarmList = _getUpcomingAlarmList(snapshot.data!, noteList);
 

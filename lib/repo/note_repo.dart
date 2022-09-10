@@ -8,7 +8,6 @@ import 'package:what_was_it_app/model/note.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:http/http.dart' as http;
 import 'package:what_was_it_app/model/notification.dart';
-import 'package:collection/collection.dart';
 
 class NoteRepo {
   static const String host = "disconnect server"; // 15.164.144.82:8080
@@ -68,21 +67,6 @@ class NoteRepo {
         key = key.toString().replaceAll("/$tableName/", "");
         await db.collection(tableName).doc(key).delete();
       }
-    }
-  }
-
-  Stream<List<Note>> getNoteStream() async* {
-    List<Note> result = [];
-    final stream = db.collection("notes").stream;
-    await for (var mapNote in stream) {
-      Note tempNote = Note.fromJson(mapNote);
-      Note? note = result.firstWhereOrNull((element) => element.noteId == tempNote.noteId);
-      if (note == null) {
-        result.add(tempNote);
-      } else {
-        result[result.indexOf(note)] = tempNote;
-      }
-      yield result;
     }
   }
 

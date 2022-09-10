@@ -8,15 +8,6 @@ import 'package:what_was_it_app/view/component/keywords_widget.dart';
 import 'package:what_was_it_app/view/component/no_title_frame_view.dart';
 import 'package:what_was_it_app/view/home/add_note_alarm_screen.dart';
 
-final addNoteDataProvider = Provider((ref) => Note(
-      title: "",
-      category: "",
-      keywords: [],
-      scheduledDates: [],
-      repeatType: RepeatType.none,
-      pubDate: DateTime.now(),
-    ));
-
 class AddNoteScreen extends ConsumerStatefulWidget {
   const AddNoteScreen({Key? key, this.note}) : super(key: key);
 
@@ -34,6 +25,15 @@ class _AddNoteWidgetState extends ConsumerState<AddNoteScreen> with SingleTicker
 
   bool couldMoveToNext = false;
 
+  final tempNote = Note(
+    title: "",
+    category: "",
+    keywords: [],
+    scheduledDates: [],
+    repeatType: RepeatType.none,
+    pubDate: DateTime.now(),
+  );
+
   @override
   void initState() {
     super.initState();
@@ -45,7 +45,7 @@ class _AddNoteWidgetState extends ConsumerState<AddNoteScreen> with SingleTicker
 
     if (widget.note != null) {
       // modify mode
-      final data = ref.read(addNoteDataProvider);
+      final data = tempNote;
       data.noteId = widget.note!.noteId;
       data.title = widget.note!.title;
       data.category = widget.note!.category;
@@ -176,13 +176,14 @@ class _AddNoteWidgetState extends ConsumerState<AddNoteScreen> with SingleTicker
                 final val = keywordController.text;
                 if (val.isNotEmpty) keywordWidgetController.addKeyword(val);
 
-                ref.read(addNoteDataProvider).title = titleController.text;
-                ref.read(addNoteDataProvider).keywords = keywordWidgetController.getKeywords();
+                tempNote.title = titleController.text;
+                tempNote.keywords = keywordWidgetController.getKeywords();
+
                 Navigator.pop(
                   context,
                   await Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const AddNoteAlarmScreen()),
+                    MaterialPageRoute(builder: (context) => AddNoteAlarmScreen(data: tempNote)),
                   ),
                 );
               },

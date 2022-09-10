@@ -13,7 +13,9 @@ import 'package:what_was_it_app/view/component/scroll_list_view.dart';
 import 'package:what_was_it_app/view/home/add_note_screen.dart';
 
 class AddNoteAlarmScreen extends ConsumerStatefulWidget {
-  const AddNoteAlarmScreen({Key? key}) : super(key: key);
+  const AddNoteAlarmScreen({Key? key, required this.data}) : super(key: key);
+
+  final Note data;
 
   @override
   ConsumerState<AddNoteAlarmScreen> createState() => _AddNoteAlarmScreenState();
@@ -34,7 +36,7 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
   void initState() {
     super.initState();
 
-    final data = ref.read(addNoteDataProvider);
+    final data = widget.data;
     _categoryController.text = data.category;
     data.scheduledDates.forEach(_alarmController.addAlarm);
     repeatType = data.repeatType;
@@ -181,8 +183,8 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
                   selectionMode: (isAlarmTypeRepeatable) ? DateRangePickerSelectionMode.single : DateRangePickerSelectionMode.multiple,
                   enablePastDates: false,
                   showNavigationArrow: true,
-                  initialSelectedDate: (ref.read(addNoteDataProvider).scheduledDates.isNotEmpty) ? ref.read(addNoteDataProvider).scheduledDates.first : null,
-                  initialSelectedDates: (ref.read(addNoteDataProvider).scheduledDates.isNotEmpty) ? ref.read(addNoteDataProvider).scheduledDates: null,
+                  initialSelectedDate: (widget.data.scheduledDates.isNotEmpty) ? widget.data.scheduledDates.first : null,
+                  initialSelectedDates: (widget.data.scheduledDates.isNotEmpty) ? widget.data.scheduledDates: null,
                   onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
                     if (isAlarmTypeRepeatable) {
                       DateTime selected = args.value as DateTime;
@@ -254,7 +256,7 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
                   return;
                 }
 
-                final note = ref.read(addNoteDataProvider);
+                final note = widget.data;
 
                 note.category = _categoryController.text;
                 note.scheduledDates = (isAlarmTypeRepeatable) ? [alarmStartsAt] : _alarmController.getAlarmList();

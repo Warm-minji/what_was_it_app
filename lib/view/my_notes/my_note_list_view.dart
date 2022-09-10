@@ -8,12 +8,20 @@ import 'package:what_was_it_app/view/component/no_title_frame_view.dart';
 import 'package:what_was_it_app/view/component/note_detail_view.dart';
 import 'package:what_was_it_app/view/component/note_list_view.dart';
 
-class MyNoteListView extends ConsumerWidget {
+class MyNoteListView extends ConsumerStatefulWidget {
   MyNoteListView({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, ref) {
+  ConsumerState<MyNoteListView> createState() => _MyNoteListViewState();
+}
+
+class _MyNoteListViewState extends ConsumerState<MyNoteListView> {
+  String filter = "";
+
+  @override
+  Widget build(BuildContext context) {
     List<Note> noteList = ref.watch(noteProvider).value ?? [];
+    List<Note> filteredNoteList = noteList.where((element) => element.category.replaceAll(" ", "").contains(filter)).toList();
 
     return NoTitleFrameView(
       body: Column(
@@ -33,8 +41,20 @@ class MyNoteListView extends ConsumerWidget {
               ],
             ),
           ),
-          const SizedBox(height: 20),
-          Expanded(child: NoteListView(noteList: noteList)),
+          TextField(
+            decoration: InputDecoration(
+              hintText: "카테고리로 검색",
+              hintStyle: TextStyle(color: Theme.of(context).primaryColor)
+            ),
+            style: TextStyle(color: Theme.of(context).primaryColor),
+            onChanged: (val) {
+              setState(() {
+                filter = val.replaceAll(" ", "");
+              });
+            },
+          ),
+          const SizedBox(height: 10),
+          Expanded(child: NoteListView(noteList: filteredNoteList)),
         ],
       ),
     );

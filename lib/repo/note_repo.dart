@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:localstore/localstore.dart';
+import 'package:notification_permissions/notification_permissions.dart';
 import 'package:what_was_it_app/core/notification_plugin.dart';
 import 'package:what_was_it_app/model/note.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -31,14 +32,33 @@ class NoteRepo {
     if (mapOldNote == null) return;
 
     final oldNote = Note.fromJson(mapOldNote);
-    await db.collection("notes").doc(noteId).set(jsonDecode(jsonEncode(newNote)));
     await _removeNotification(oldNote);
     await _registerNoteToNotificationSystem(newNote);
+    await db.collection("notes").doc(noteId).set(jsonDecode(jsonEncode(newNote)));
   }
 
   Future clearDB() async {
     await _clearDBTable("notes");
     await _clearDBTable("core");
+  }
+
+  Future shouldRefreshNotifications() async {
+    return (await db.collection("core").doc("shouldRefreshNotifications").get())?["state"] ?? false;
+  }
+
+  Future refreshNotifications() async {
+    final notes = await db.collection("notes").get();
+    if (notes == null) return;
+
+    await db.collection("core").doc("notificationId").delete();
+    await flutterLocalNotificationsPlugin.cancelAll();
+
+    for (final key in notes.keys) {
+      final note = Note.fromJson(notes[key]);
+      await modifyNote(note.noteId!, note);
+    }
+
+    await db.collection("core").doc("shouldRefreshNotifications").set({"state" : false});
   }
 
   Future _clearDBTable(String tableName) async {
@@ -218,10 +238,17 @@ class NoteRepo {
   }
 
   Future _registerNoteToNotificationSystem(Note note) async {
+    final perm = await NotificationPermissions.getNotificationPermissionStatus();
+    if(perm == PermissionStatus.denied || perm == PermissionStatus.unknown) {
+      await db.collection("core").doc("shouldRefreshNotifications").set({"state": true});
+      return;
+    }
+
+    note.notifications = null;
+
     int notificationId = await _getNextNotificationId();
 
     for (tz.TZDateTime scheduledDate in _getNoteAlarmDate(note)) {
-      // TODO map 동작 안하는데 왜 그런지 알아보기
       if (note.repeatType != RepeatType.none || scheduledDate.isAfter(tz.TZDateTime.now(tz.local))) {
         await _addNotification(scheduledDate, note, notificationId++);
       }

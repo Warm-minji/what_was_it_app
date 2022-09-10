@@ -343,7 +343,7 @@ class _AddNoteAlarmScreenState extends ConsumerState<AddNoteAlarmScreen> {
                           final perm = snapshot.data;
                           if (perm == PermissionStatus.denied || perm == PermissionStatus.unknown) {
                             return const Text(
-                              "현재 알림 기능이 비활성화 상태입니다.\n알림 기능을 이용하려면 홈화면 우측 상단을 클릭하여 설정 후 노트를 추가해주세요.\n\n추가 후에는 알림을 설정할 수 없습니다.",
+                              "현재 알림 기능이 비활성화 상태입니다.\n알림 기능을 이용하려면 메인화면 우측 상단을 클릭하여 설정해주세요.",
                               style: TextStyle(color: Colors.red),
                             );
                           } else {

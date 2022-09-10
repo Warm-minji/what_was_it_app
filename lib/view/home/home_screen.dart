@@ -53,6 +53,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         _notificationPerm = _checkNotificationPermission(perm);
       });
     }
+    if (_checkNotificationPermission(perm)) {
+      if (await ref.read(noteRepoProvider).shouldRefreshNotifications()) {
+        await ref.read(noteRepoProvider).refreshNotifications();
+      }
+    }
   }
 
   bool _checkNotificationPermission(PermissionStatus perm) => !(perm == PermissionStatus.denied || perm == PermissionStatus.unknown);

@@ -1,4 +1,8 @@
 # 기억하다 APP 📱
+https://apps.apple.com/kr/app/%EA%B8%B0%EC%96%B5%ED%95%98%EB%8B%A4/id1641054781
+<br>
+https://play.google.com/store/apps/details?id=com.sudwlsdks.what_was_it_app
+<br><br>
 <img src="https://user-images.githubusercontent.com/51053567/184148247-2b8ba99c-42b4-4b29-9fc2-e686d39322d1.png" width=250>
 
 ## 소개
